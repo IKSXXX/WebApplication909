@@ -14,8 +14,18 @@ namespace WebApplication909.Controllers
         [HttpPost]
         public IActionResult Authorization(Authorization authorization)
         {
-            return View();
+            if (authorization.Login == authorization.Password)
+            {
+                ModelState.AddModelError("",
+                    "Логин и пароль не должны совпадать");
+            };
+            if (!ModelState.IsValid)
+            {
+                return View(authorization);
+            }
+            return RedirectToAction(nameof(Index), "Home");
         }
+
         public IActionResult Registration()
         {
             return View();
@@ -24,7 +34,18 @@ namespace WebApplication909.Controllers
         [HttpPost]
         public IActionResult Registration(Registration registration)
         {
-            return View();
+            if (registration.Login == registration.Password)
+            {
+                ModelState.AddModelError("",
+                    "Имя и пароль не должны совпадать");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(registration);
+            }
+
+            return RedirectToAction(nameof(Index), "Home");
         }
     }
 }

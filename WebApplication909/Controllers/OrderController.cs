@@ -22,31 +22,37 @@ namespace WebApplication909.Controllers
         {
             var cart = _cartsRepository.TryGetByUserId(Constants.UserId);
 
-            return View(cart);
+            var order = new Order()
+            {
+                Items = cart?.Items ?? [],
+            };
+
+            return View(order);
         }
 
         [HttpPost]
-        public IActionResult Buy(DeliveryUser deliveryUser)
+        public IActionResult Buy(Order order)
         {
             var cart = _cartsRepository.TryGetByUserId(Constants.UserId);
 
-            if (cart is null)
+            if (cart == null)
             {
-                return RedirectToAction("Index", "Home");
+                return View(nameof(Index), order);
             }
 
-            var order = new Order
+            order.Items = cart.Items;
+            order.UserId = Constants.UserId;
+
+            if (!ModelState.IsValid)
             {
-                UserId = Constants.UserId,
-                Items = cart.Items,
-                DeliveryUser = deliveryUser
-            };
+                return View(nameof(Index), order);
+            }
 
             _ordersRepository.Add(order);
 
             _cartsRepository.Clear(Constants.UserId);
 
-            return RedirectToAction("Success");
+            return RedirectToAction(nameof(Success));
         }
 
         public IActionResult Success()

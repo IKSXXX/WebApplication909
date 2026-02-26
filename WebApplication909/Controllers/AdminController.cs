@@ -4,20 +4,14 @@ using WebApplication909.Models;
 
 namespace WebApplication909.Controllers
 {
-    public class AdminController : Controller
+    public class AdminController(IProductsRepository productsRepository) : Controller
     {
-        private readonly IProductsRepository _productsRepository;
-
-        public AdminController(IProductsRepository productsRepository)
-        {
-            _productsRepository = productsRepository;
-        }
         public IActionResult Orders()
         {
             return View();
         }
 
-        public IActionResult Products()
+        public IActionResult Users()
         {
             return View();
         }
@@ -27,11 +21,21 @@ namespace WebApplication909.Controllers
             return View();
         }
 
-        public IActionResult Users()
+        public IActionResult Products()
         {
-            return View();
+            var products = productsRepository.GetAll();
+
+            return View(products);
         }
-        public IActionResult AddProduct()
+
+        public IActionResult DeleteProduct(int id)
+        {
+            productsRepository.Delete(id);
+
+            return RedirectToAction("Products");
+        }
+
+        public ActionResult AddProduct()
         {
             return View();
         }
@@ -39,30 +43,34 @@ namespace WebApplication909.Controllers
         [HttpPost]
         public IActionResult AddProduct(Product product)
         {
-            _productsRepository.Add(product);
+            if (!ModelState.IsValid)
+            {
+                return View(product);
+            }
 
-            return RedirectToAction("Products", "Admin");
+            productsRepository.Add(product);
+
+            return RedirectToAction(nameof(Products));
         }
-        public IActionResult DeleteProduct(int id)
+
+        public ActionResult UpdateProduct(int id)
         {
-            _productsRepository.Delete(id);
+            var product = productsRepository.TryGetById(id);
 
-            return RedirectToAction("Products", "Admin");
-        }
-
-        public IActionResult UpdateProduct(int id)
-        {
-            var existingProduct = _productsRepository.TryGetById(id);
-
-            return View(existingProduct);
+            return View(product);
         }
 
         [HttpPost]
         public IActionResult UpdateProduct(Product product)
         {
-            _productsRepository.Update(product);
+            if (!ModelState.IsValid)
+            {
+                return View(product);
+            }
 
-            return RedirectToAction("Products", "Admin");
+            productsRepository.Update(product);
+
+            return RedirectToAction(nameof(Products));
         }
     }
 }
