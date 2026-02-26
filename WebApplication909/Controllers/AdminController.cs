@@ -4,23 +4,82 @@ using WebApplication909.Models;
 
 namespace WebApplication909.Controllers
 {
-    public class AdminController(IProductsRepository productsRepository) : Controller
+    public class AdminController(IProductsRepository productsRepository,
+                               IOrdersRepository ordersRepository,
+                               IRolesRepository rolesRepository) : Controller
     {
+        #region Orders
         public IActionResult Orders()
         {
-            return View();
+            var orders = ordersRepository.GetAll();
+
+            return View(orders);
         }
+
+        public IActionResult DetailOrder(Guid orderId)
+        {
+            var order = ordersRepository.TryGetById(orderId);
+
+            return View(order);
+        }
+
+        [HttpPost]
+        public IActionResult UpdateOrderStatus(Guid orderId, OrderStatus status)
+        {
+            ordersRepository.UpdateStatus(orderId, status);
+
+            return RedirectToAction(nameof(Orders));
+        }
+
+        #endregion
 
         public IActionResult Users()
         {
             return View();
         }
 
+
+        #region Roles
         public IActionResult Roles()
+        {
+            var roles = rolesRepository.GetAll();
+
+            return View(roles);
+        }
+
+        public IActionResult AddRole()
         {
             return View();
         }
 
+        [HttpPost]
+        public IActionResult AddRole(Role role)
+        {
+            if (rolesRepository.TryGetByName(role.Name) != null)
+            {
+                ModelState.AddModelError("", "Такая роль уже существует!");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(role);
+            }
+
+            rolesRepository.Add(role);
+
+            return RedirectToAction(nameof(Roles));
+        }
+
+        public IActionResult DeleteRole(Guid roleId)
+        {
+            rolesRepository.Delete(roleId);
+
+            return RedirectToAction(nameof(Roles));
+        }
+
+        #endregion
+
+        #region Products
         public IActionResult Products()
         {
             var products = productsRepository.GetAll();
@@ -41,7 +100,7 @@ namespace WebApplication909.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddProduct(Product product)
+        public ActionResult AddProduct(Product product)
         {
             if (!ModelState.IsValid)
             {
@@ -50,7 +109,7 @@ namespace WebApplication909.Controllers
 
             productsRepository.Add(product);
 
-            return RedirectToAction(nameof(Products));
+            return RedirectToAction("Products");
         }
 
         public ActionResult UpdateProduct(int id)
@@ -61,7 +120,7 @@ namespace WebApplication909.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateProduct(Product product)
+        public ActionResult UpdateProduct(Product product)
         {
             if (!ModelState.IsValid)
             {
@@ -70,7 +129,8 @@ namespace WebApplication909.Controllers
 
             productsRepository.Update(product);
 
-            return RedirectToAction(nameof(Products));
+            return RedirectToAction("Products");
         }
+        #endregion
     }
 }

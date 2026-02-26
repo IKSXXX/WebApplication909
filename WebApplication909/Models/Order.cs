@@ -22,5 +22,8 @@ namespace WebApplication909.Models
         public decimal? TotalCost => Items?.Sum(item => item.Cost);
 
         public int? ItemsQuantity => Items?.Sum(item => item.Quantity);
+
+        [Required]
+        public OrderStatus Status { get; set; }
     }
 }

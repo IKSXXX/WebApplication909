@@ -39,5 +39,8 @@ namespace WebApplication909.Models
         [MaxLength(512, ErrorMessage = "Максимальная длина комментария {1} символов")]
         [DataType(DataType.MultilineText)]
         public string? Comment { get; set; }
+
+        [Required]
+        public Guid Id { get; set; }
     }
 }

@@ -20,6 +20,7 @@ namespace OnlineShopWebApp
             builder.Services.AddSingleton<IOrdersRepository, InMemoryOrdersRepository>();
             builder.Services.AddSingleton<IFavoritesRepository, InMemoryFavouritesRepository>();
             builder.Services.AddSingleton<IComparisonsRepository, InMemoryComparisonsRepository>();
+            builder.Services.AddSingleton<IRolesRepository, InMemoryRolesRepository>();
             builder.Services.Configure<RequestLocalizationOptions>(options =>
             {
                 var supportedCultures = new[]

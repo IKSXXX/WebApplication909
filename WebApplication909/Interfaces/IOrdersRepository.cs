@@ -6,6 +6,7 @@ namespace WebApplication909.Interfaces
     {
         void Add(Order order);
         List<Order> GetAll();
-        Order? TryGetById(string id);
+        Order? TryGetById(Guid id);
+        void UpdateStatus(Guid orderId, OrderStatus status);
     }
 }
