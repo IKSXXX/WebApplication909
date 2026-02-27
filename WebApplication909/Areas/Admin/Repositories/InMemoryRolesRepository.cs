@@ -1,7 +1,7 @@
-﻿using WebApplication909.Models;
-using WebApplication909.Interfaces;
+﻿using WebApplication909.Areas.Admin.Models;
+using WebApplication909.Areas.Admin.Interfaces;
 
-namespace WebApplication909.Repositories
+namespace WebApplication909.Areas.Admin.Repositories
 {
     public class InMemoryRolesRepository : IRolesRepository
     {

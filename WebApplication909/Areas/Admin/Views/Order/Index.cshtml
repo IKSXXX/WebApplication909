@@ -38,9 +38,10 @@
                                     <td>@Model[i].CreationDateTime.ToShortTimeString()</td>
                                     <td align="left">
                                         <a class="text-success"
-                                           asp-controller="Admin"
-                                           asp-action="DetailOrder"
-                                           asp-route-OrderId="@Model[i].Id">
+                                           asp-area="Admin"
+                                           asp-controller="Order"
+                                           asp-action="Detail"
+                                           asp-route-orderId="@Model[i].Id">
                                             Подробнее
                                         </a>
                                     </td>
@@ -65,6 +66,5 @@
                 <h2 class="row-title">В хранилище нет заказов!</h2>
             </div>
         }
-
     </div>
 </div>

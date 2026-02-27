@@ -5,6 +5,8 @@ using WebApplication909;
 using WebApplication909.Interfaces;
 using WebApplication909.Repositories;
 using Serilog;
+using WebApplication909.Areas.Admin.Repositories;
+using WebApplication909.Areas.Admin.Interfaces;
 
 namespace OnlineShopWebApp
 {
@@ -12,59 +14,46 @@ namespace OnlineShopWebApp
     {
         public static void Main(string[] args)
         {
-            
-
-
             var builder = WebApplication.CreateBuilder(args);
 
-            Log.Logger = new LoggerConfiguration()
-                    .CreateLogger(); //инициализация глобального логера Serilog с базовой конфигурацией
-
-            try //начало блока для обработки ошибок запуска приложения
+            // Настройка Serilog (упрощено, убрана пустая инициализация)
+            builder.Host.UseSerilog((context, loggerConfiguration) =>
             {
-                Log.Information("Starting server..."); //запись информационного сообщения о запуске сервера
+                loggerConfiguration.ReadFrom.Configuration(context.Configuration);
+            });
 
-                builder.Host.UseSerilog((context, loggerConfiguration) =>
-                {
-                    loggerConfiguration.ReadFrom.Configuration(context.Configuration);
-                }); //подключение Serilog в качестве службы логирования по умолчанию, конфигурация настроек читается 
-                    //из файла конфигурации
+            builder.Services.AddControllersWithViews();
 
+            // Регистрация репозиториев
+            builder.Services.AddSingleton<IProductsRepository, InMemoryProductsRepository>();
+            builder.Services.AddSingleton<ICartsRepository, InMemoryCartsRepository>();
+            builder.Services.AddSingleton<IOrdersRepository, InMemoryOrdersRepository>();
+            builder.Services.AddSingleton<IFavoritesRepository, InMemoryFavouritesRepository>();
+            builder.Services.AddSingleton<IComparisonsRepository, InMemoryComparisonsRepository>();
+            builder.Services.AddSingleton<IRolesRepository, InMemoryRolesRepository>();
 
-                // Add services to the container.
-                builder.Services.AddControllersWithViews();
+            var app = builder.Build();
 
-                builder.Services.AddSingleton<IProductsRepository, InMemoryProductsRepository>();
-                builder.Services.AddSingleton<ICartsRepository, InMemoryCartsRepository>();
-                builder.Services.AddSingleton<IOrdersRepository, InMemoryOrdersRepository>();
-                builder.Services.AddSingleton<IFavoritesRepository, InMemoryFavouritesRepository>();
-                builder.Services.AddSingleton<IComparisonsRepository, InMemoryComparisonsRepository>();
-                builder.Services.AddSingleton<IRolesRepository, InMemoryRolesRepository>();
+            app.UseSerilogRequestLogging();
 
+            app.UseHttpsRedirection();
 
-                var app = builder.Build();
+            // ВАЖНО: включаем раздачу статических файлов (css, js, изображения)
+            app.UseStaticFiles();
 
-                app.UseSerilogRequestLogging(); //замена логирования, используемого по умолчанию в ASP.NET Core, 
-                                                //на ведение журнала запросов Serilog
+            app.UseRouting();
 
-                app.UseHttpsRedirection();
+            // Маршрут для областей
+            app.MapControllerRoute(
+                name: "areas",
+                pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
-                app.UseRouting();
+            // Маршрут по умолчанию
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
-                app.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-                app.Run();
-            }
-            catch (Exception ex) //обработка ошибок запуска: логируется критическая ошибка при аварийном завершении, а затем закрываются и очищаются все логи
-            {
-                Log.Fatal(ex, "server terminated unexpectedly");
-            }
-            finally
-            {
-                Log.CloseAndFlush();
-            }
+            app.Run();
         }
     }
 }

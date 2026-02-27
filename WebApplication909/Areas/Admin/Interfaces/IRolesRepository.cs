@@ -1,6 +1,6 @@
-﻿using WebApplication909.Models;
+﻿using WebApplication909.Areas.Admin.Models;
 
-namespace WebApplication909.Interfaces
+namespace WebApplication909.Areas.Admin.Interfaces
 {
     public interface IRolesRepository
     {
