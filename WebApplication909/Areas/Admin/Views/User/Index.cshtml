@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<User>
+@{
     ViewData["Title"] = "Пользователи";
 }
 
@@ -8,7 +9,82 @@
         <div class="text-center text-uppercase text-success mb-5 mt-5">
             <h2 class="row-title">Пользователи</h2>
         </div>
-        <!-- Здесь будет таблица пользователей после добавления аутентификации -->
-        <p class="text-muted">Функционал управления пользователями будет добавлен позже.</p>
+
+        @if (Model != null && Model.Count > 0)
+        {
+            <div class="row justify-content-center mt-3">
+                <div class="col-12">
+                    <div class="text-end">
+                        <a class="btn btn-outline-success mb-2 mt-2"
+                           asp-area="Admin"
+                           asp-controller="User"
+                           asp-action="Add">
+                            Добавить нового пользователя
+                        </a>
+                    </div>
+                    <table class="table table-responsive table-striped table-hover mb-5">
+                        <thead>
+                            <tr align="center">
+                                <th scope="col">#</th>
+                                <th scope="col">Логин</th>
+                                <th scope="col">Email</th>
+                                <th scope="col"></th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (var i = 0; i < Model.Count; i++)
+                            {
+                                <tr align="center" class="align-baseline">
+                                    <td class="fw-bold">@(i + 1)</td>
+                                    <td align="left">@Model[i].Login</td>
+                                    <td align="left">@Model[i].Email</td>
+                                    <td>
+                                        <a class="btn btn-outline-success"
+                                           asp-area="Admin"
+                                           asp-controller="User"
+                                           asp-action="Update"
+                                           asp-route-id="@Model[i].Id">
+                                            Редактировать
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-outline-success"
+                                           asp-area="Admin"
+                                           asp-controller="User"
+                                           asp-action="Delete"
+                                           asp-route-id="@Model[i].Id">
+                                            Удалить
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr align="center">
+                                <th colspan="3"></th>
+                                <th colspan="2">
+                                    Общее количество пользователей: @Model.Count
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="text-center">
+                <h2 class="row-title">В хранилище нет пользователей!</h2>
+            </div>
+            <div class="text-center mt-5">
+                <a class="btn btn-outline-success mb-2 mt-2"
+                   asp-area="Admin"
+                   asp-controller="User"
+                   asp-action="Add">
+                    Добавить нового пользователя
+                </a>
+            </div>
+        }
     </div>
 </div>

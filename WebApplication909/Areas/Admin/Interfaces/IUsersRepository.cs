@@ -1,4 +1,4 @@
-﻿using WebApplication909.Areas.Admin.Models;
+﻿using WebApplication909.Models;
 
 namespace WebApplication909.Areas.Admin.Interfaces
 {
@@ -13,5 +13,6 @@ namespace WebApplication909.Areas.Admin.Interfaces
         void Add(User user);
 
         void Delete(Guid userId);
+        void Update(User user);
     }
 }
