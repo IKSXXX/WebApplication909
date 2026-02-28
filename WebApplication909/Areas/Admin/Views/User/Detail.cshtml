@@ -22,7 +22,7 @@
                             data-bs-toggle="dropdown" aria-expanded="false">
                         Действия
                     </button>
-                    <ul class="dropdown-menu list-group-item-success" aria-labelledby="dropdownMenuButton">
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <li>
                             <a class="dropdown-item"
                                asp-area="Admin"
@@ -51,11 +51,7 @@
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item"
-                               asp-area="Admin"
-                               asp-controller="User"
-                               asp-action="Delete"
-                               asp-route-id="@Model.Id">
+                            <a class="dropdown-item" data-bs-target="#Returned" data-bs-toggle="modal">
                                 Удалить пользователя
                             </a>
                         </li>
@@ -100,6 +96,36 @@
                     <h2>Такого пользователя не существует!</h2>
                 </div>
             }
+
+            <div class="modal fade" id="Returned" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="modalWindow" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <p class="modal-title fw-bold" id="modalWindow">Удаление пользователя</p>
+                        </div>
+                        <div class="modal-body">
+                            Вы действительно хотите удалить пользователя "@Model.Login"?
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-outline-danger w-25" type="submit"
+                                    asp-area="Admin"
+                                    asp-controller="User"
+                                    asp-action="Delete"
+                                    asp-route-id=@Model.Id>
+                                Удалить
+                            </button>
+
+                            <a class="btn btn-outline-success w-25" role="button" data-bs-dismiss="modal"
+                               asp-area="Admin"
+                               asp-controller="User"
+                               asp-action="Index">
+                                Отмена
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </form>
     </div>
 </div>

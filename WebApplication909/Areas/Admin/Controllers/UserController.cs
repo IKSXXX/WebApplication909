@@ -22,7 +22,7 @@ namespace WebApplication909.Areas.Admin.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
+        
         public IActionResult Detail(Guid id)
         {
             var user = _usersRepository.TryGetById(id);

@@ -42,7 +42,7 @@
                                            asp-area=""
                                            asp-controller="Product"
                                            asp-action="Index"
-                                           asp-route-id="@Model[i].Id">
+                                           asp-route-Id="@Model[i].Id">
                                             <h5>@Model[i].Name</h5>
                                         </a>
                                     </td>
@@ -52,18 +52,45 @@
                                            asp-area="Admin"
                                            asp-controller="Product"
                                            asp-action="Update"
-                                           asp-route-id="@Model[i].Id">
+                                           asp-route-Id="@Model[i].Id">
                                             Редактировать
                                         </a>
                                     </td>
                                     <td>
-                                        <a class="btn btn-outline-success"
-                                           asp-area="Admin"
-                                           asp-controller="Product"
-                                           asp-action="Delete"
-                                           asp-route-id="@Model[i].Id">
+                                        <a class="btn btn-outline-success" data-bs-target="#Returned_@i" data-bs-toggle="modal">
                                             Удалить
                                         </a>
+
+                                        <div class="modal fade" id="Returned_@i" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="modalWindow" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <p class="modal-title fw-bold" id="modalWindow">Удаление товара</p>
+                                                    </div>
+                                                    <form method="post">
+                                                        <div class="modal-body">
+                                                            Вы действительно хотите удалить товар "@Model[i].Name"?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-outline-danger w-25" type="submit"
+                                                                    asp-area="Admin"
+                                                                    asp-controller="Product"
+                                                                    asp-action="Delete"
+                                                                    asp-route-Id=@Model[i].Id>
+                                                                Удалить
+                                                            </button>
+
+                                                            <a class="btn btn-outline-success w-25" role="button" data-bs-dismiss="modal"
+                                                               asp-area="Admin"
+                                                               asp-controller="Product"
+                                                               asp-action="Index">
+                                                                Отмена
+                                                            </a>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             }
