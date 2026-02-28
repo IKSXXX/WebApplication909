@@ -1,38 +1,48 @@
 ﻿@model User
 @{
-    ViewData["Title"] = "Редактирование пользователя";
+    ViewData["Title"] = "Редактирование данных пользователя";
 }
 
-<h2>Редактирование пользователя</h2>
+<div class="text-center text-uppercase text-success mb-5 mt-5">
+    <h2 class="row-title">Редактирование данных пользователя</h2>
+</div>
 
-<form asp-action="Update" method="post">
-    <input type="hidden" asp-for="Id" />
+<form method="post">
+    <div class="row justify-content-center mt-3">
+        <div class="col-6 mb-3">
+            <div class="text-danger fw-bold text-uppercase" asp-validation-summary="All"></div>
+            <input type="hidden" name="Id" value="@Model.Id" />
 
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-    <div class="form-group">
-        <label asp-for="Login" class="control-label"></label>
-        <input asp-for="Login" class="form-control" />
-        <span asp-validation-for="Login" class="text-danger"></span>
+            <p>
+                <label class="form-label" asp-for="FirstName"></label><br />
+                <input class="form-control" asp-for="FirstName" value="@Model.FirstName" />
+                <span asp-validation-for="FirstName"></span>
+            </p>
+            <p>
+                <label class="form-label" asp-for="LastName"></label><br />
+                <input class="form-control" asp-for="LastName" value="@Model.LastName" />
+                <span asp-validation-for="LastName"></span>
+            </p>
+            <p>
+                <label class="form-label" asp-for="Phone"></label><br />
+                <input class="form-control" asp-for="Phone" value="@Model.Phone" />
+                <span asp-validation-for="Phone"></span>
+            </p>
+            <p>
+                <label class="form-label" asp-for="Login"></label><br />
+                <input class="form-control" asp-for="Login" value="@Model.Login" readonly="readonly" />
+                <span asp-validation-for="Login"></span>
+            </p>
+            <p>
+                <label class="form-label" asp-for="Password"></label><br />
+                <input class="form-control" asp-for="Password" value="@Model.Password" readonly="readonly" />
+                <span asp-validation-for="Password"></span>
+            </p>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Password" class="control-label"></label>
-        <input asp-for="Password" type="password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-        <small class="form-text text-muted">Оставьте пустым, если не хотите менять пароль</small>
+    <div class="text-center m-3">
+        <button class="btn btn-outline-success" type="submit">
+            Обновить
+        </button>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Email" class="control-label"></label>
-        <input asp-for="Email" type="email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Сохранить</button>
-    <a asp-action="Index" class="btn btn-secondary">Отмена</a>
 </form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

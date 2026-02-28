@@ -11,10 +11,26 @@
         <div class="col-6 mb-3">
             <div class="text-danger fw-bold text-uppercase" asp-validation-summary="All"></div>
             <p>
+                <label class="form-label" asp-for="FirstName"></label><br />
+                <input class="form-control" asp-for="FirstName" />
+                <span asp-validation-for="FirstName"></span>
+
+            </p>
+            <p>
+                <label class="form-label" asp-for="LastName"></label><br />
+                <input class="form-control" asp-for="LastName" />
+                <span asp-validation-for="LastName"></span>
+
+            </p>
+            <p>
+                <label class="form-label" asp-for="Phone"></label><br />
+                <input class="form-control" asp-for="Phone" />
+                <span asp-validation-for="Phone"></span>
+            </p>
+            <p>
                 <label class="form-label" asp-for="Login"></label><br />
                 <input class="form-control" asp-for="Login" />
                 <span asp-validation-for="Login"></span>
-
             </p>
             <p>
                 <label class="form-label" asp-for="Password"></label><br />
@@ -30,6 +46,7 @@
     </div>
     <div class="text-center m-3">
         <button class="btn btn-outline-success" type="submit"
+                asp-area=""
                 asp-controller="Account"
                 asp-action="Registration">
             Зарегистрироваться

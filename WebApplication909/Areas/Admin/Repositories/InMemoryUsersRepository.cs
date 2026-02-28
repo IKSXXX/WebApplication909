@@ -1,54 +1,77 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Configuration;
 using WebApplication909.Areas.Admin.Interfaces;
+using WebApplication909.Areas.Admin.Models;
 using WebApplication909.Models;
 
 namespace WebApplication909.Areas.Admin.Repositories
 {
     public class InMemoryUsersRepository : IUsersRepository
     {
-        private List<User> users { get; set; }
+        private readonly List<User> _users = [];
 
-        public InMemoryUsersRepository()
-        {
-            users = new List<User>();
-        }
 
         public void Add(User user)
         {
             user.Id = Guid.NewGuid();
-            users.Add(user);
+            user.CreationDateTime = DateTime.Now;
+
+            _users.Add(user);
         }
+
+
+        public User? TryGetByLogin(string login) =>
+            _users.FirstOrDefault(user => user.Login == login);
+
+
+        public List<User> GetAll() => _users;
+
+
+        public User? TryGetById(Guid userId) =>
+            _users.FirstOrDefault(user => user.Id == userId);
+
 
         public void Delete(Guid userId)
         {
-            var user = TryGetById(userId);
+            var existingUser = TryGetById(userId);
 
-            if (user != null)
+            if (existingUser != null)
             {
-                users.Remove(user);
+                _users.Remove(existingUser);
             }
         }
 
         public void Update(User user)
         {
             var existingUser = TryGetById(user.Id);
+
             if (existingUser != null)
             {
-                existingUser.Login = user.Login;
-                if (!string.IsNullOrWhiteSpace(user.Password))
-                    existingUser.Password = user.Password;
-                existingUser.Email = user.Email;
+                existingUser.FirstName = user.FirstName;
+                existingUser.LastName = user.LastName;
+                existingUser.Phone = user.Phone;
             }
         }
 
 
-        public List<User> GetAll() => users;
+        public void ChangePassword(string login, string newPassword)
+        {
+            var existingUser = TryGetByLogin(login);
 
-        public User? TryGetById(Guid userId) => 
-            users.FirstOrDefault(u => u.Id == userId);
+            if (existingUser != null)
+            {
+                existingUser.Password = newPassword;
+            }
+        }
 
-        public User? TryGetByLogin(string userLogin) =>
-            users.FirstOrDefault(u => u.Login == userLogin);
+        public void ChangeRole(string login, Role? newRole)
+        {
+            var existingUser = TryGetByLogin(login);
+
+            if (existingUser != null)
+            {
+                existingUser.Role = newRole;
+            }
+        }
     }
 }
