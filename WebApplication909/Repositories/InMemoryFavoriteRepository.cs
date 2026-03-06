@@ -1,12 +1,11 @@
-﻿using System.Xml.Linq;
+﻿using OnlineShop.Db.Models;
 using WebApplication909.Interfaces;
-using WebApplication909.Models;
 
 namespace WebApplication909.Repositories
 {
-    public class InMemoryFavouritesRepository : IFavoritesRepository
+    public class InMemoryFavoritesRepository : IFavoritesRepository
     {
-        private readonly List<Favorite> _favorites = [];
+        private readonly List<Favorite> _favorites = new();
 
         public Favorite? TryGetByUserId(string userId)
         {
@@ -16,23 +15,20 @@ namespace WebApplication909.Repositories
         public void Add(Product product, string userId)
         {
             var existingFavorite = TryGetByUserId(userId);
-
             if (existingFavorite == null)
             {
                 existingFavorite = new Favorite()
                 {
                     Id = Guid.NewGuid(),
                     UserId = userId,
-                    Items = [product]
+                    Items = new List<Product> { product }
                 };
-
                 _favorites.Add(existingFavorite);
             }
             else
             {
-                var existingFavoriteItem = existingFavorite.Items.FirstOrDefault(x => x.Id == product.Id);
-
-                if (existingFavoriteItem == null)
+                var existingItem = existingFavorite.Items.FirstOrDefault(x => x.Id == product.Id);
+                if (existingItem == null)
                 {
                     existingFavorite.Items.Add(product);
                 }
@@ -42,20 +38,19 @@ namespace WebApplication909.Repositories
         public void Delete(int productId, string userId)
         {
             var existingFavorite = TryGetByUserId(userId);
-
-            var existingFavoriteItem = existingFavorite?.Items.FirstOrDefault(x => x.Id == productId);
-
-            if (existingFavoriteItem != null)
+            if (existingFavorite != null)
             {
-                existingFavorite?.Items.Remove(existingFavoriteItem);
+                var item = existingFavorite.Items.FirstOrDefault(x => x.Id == productId);
+                if (item != null)
+                {
+                    existingFavorite.Items.Remove(item);
+                }
             }
-
         }
 
         public void Clear(string userId)
         {
             var existingFavorite = TryGetByUserId(userId);
-
             if (existingFavorite != null)
             {
                 _favorites.Remove(existingFavorite);
