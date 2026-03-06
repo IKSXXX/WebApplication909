@@ -1,12 +1,11 @@
-using Microsoft.AspNetCore.Localization;
 using Serilog;
-using System.Globalization;
 using WebApplication909;
 using WebApplication909.Interfaces;
 using WebApplication909.Repositories;
-using Serilog;
 using WebApplication909.Areas.Admin.Repositories;
 using WebApplication909.Areas.Admin.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace OnlineShopWebApp
 {
@@ -15,6 +14,8 @@ namespace OnlineShopWebApp
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            string connection = builder.Configuration.GetConnectionString("OnlineShopConnection");
 
             // Настройка Serilog (упрощено, убрана пустая инициализация)
             builder.Host.UseSerilog((context, loggerConfiguration) =>

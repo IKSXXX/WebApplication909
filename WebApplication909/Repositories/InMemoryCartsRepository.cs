@@ -7,7 +7,7 @@ namespace WebApplication909
     public class InMemoryCartsRepository : ICartsRepository
     {
         private readonly List<Cart> _carts = [];
-
+        
         public Cart? TryGetByUserId(string userId)
         {
             return _carts.FirstOrDefault(cart => cart.UserId == userId);
