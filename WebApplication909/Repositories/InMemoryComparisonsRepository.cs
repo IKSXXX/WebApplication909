@@ -13,7 +13,7 @@ namespace WebApplication909.Repositories
             return _comparisons.FirstOrDefault(x => x.UserId == userId);
         }
 
-        public void Add(Product product, string userId)
+        public void Add(ProductViewModel product, string userId)
         {
             var existingComparison = TryGetByUserId(userId);
 

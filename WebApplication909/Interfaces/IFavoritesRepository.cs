@@ -1,5 +1,5 @@
-﻿using WebApplication909.Models;
-using OnlineShop.Db.Models;
+﻿using OnlineShop.Db.Models;
+using WebApplication909.Models;
 
 namespace WebApplication909.Interfaces
 {

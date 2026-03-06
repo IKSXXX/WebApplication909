@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using OnlineShop.Db.Interfaces;
+using OnlineShop.Db.Models;
 using WebApplication909.Interfaces;
-using WebApplication909.Models;
 
 namespace WebApplication909.Controllers
 {

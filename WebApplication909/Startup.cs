@@ -10,6 +10,8 @@ using WebApplication909.Areas.Admin.Interfaces;
 using WebApplication909.Areas.Admin.Repositories;
 using Microsoft.EntityFrameworkCore;
 using OnlineShop.Db;
+using OnlineShop.Db.Interfaces;
+using OnlineShop.Db.Repositories;
 using OnlineShop.Db.Models; // если потребуется в этом файле
 
 namespace WebApplication909

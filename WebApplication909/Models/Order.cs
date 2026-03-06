@@ -11,7 +11,7 @@ namespace WebApplication909.Models
         public string UserId { get; set; }
 
         [ValidateNever]
-        public List<CartItem> Items { get; set; }
+        public List<CartItemViewModel> Items { get; set; }
 
         [Required]
         public DeliveryUser DeliveryUser { get; set; }

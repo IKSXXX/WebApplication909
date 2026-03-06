@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebApplication909.Interfaces;
+using OnlineShop.Db.Interfaces;
 using WebApplication909.Models;
 
 namespace WebApplication909.Views.Shared.ViewComponents.CartViewComponents

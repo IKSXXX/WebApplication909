@@ -2,7 +2,7 @@
 
 namespace WebApplication909.Models
 {
-    public class Product
+    public class ProductViewModel
     {
         public int Id { get; set; }
 
@@ -25,9 +25,9 @@ namespace WebApplication909.Models
         [Required]
         public string? PhotoPath { get; set; } = "/img/anyProduct.png";
 
-        public Product() { }
+        public ProductViewModel() { }
 
-        public Product(int id, string name, decimal cost, string? description)
+        public ProductViewModel(int id, string name, decimal cost, string? description)
         {
             Id = id;
             Name = name;
