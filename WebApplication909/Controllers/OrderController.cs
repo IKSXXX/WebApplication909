@@ -4,6 +4,8 @@ using WebApplication909.Models;
 using System.Security.Cryptography.X509Certificates;
 using System.Runtime.Serialization;
 using WebApplication909.Interfaces;
+using OnlineShop.Db.Interfaces;
+using WebApplication909.Helpers;
 
 namespace WebApplication909.Controllers
 {
@@ -22,9 +24,11 @@ namespace WebApplication909.Controllers
         {
             var cart = _cartsRepository.TryGetByUserId(Constants.UserId);
 
+            var cartView = cart.ToCartViewModel();
+
             var order = new Order()
             {
-                Items = cart?.Items ?? [],
+                Items = cartView?.Items ?? [],
             };
 
             return View(order);
@@ -39,8 +43,10 @@ namespace WebApplication909.Controllers
             {
                 return View(nameof(Index), order);
             }
+            var cartView = cart.ToCartViewModel();
 
-            order.Items = cart.Items;
+            order.Items = cartView.Items;
+
             order.UserId = Constants.UserId;
 
             if (!ModelState.IsValid)

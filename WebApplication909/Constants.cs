@@ -1,4 +1,4 @@
-﻿namespace WebApplication909.Models
+﻿namespace WebApplication909
 {
     public static class Constants
     {

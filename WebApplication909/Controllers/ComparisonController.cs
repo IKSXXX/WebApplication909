@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApplication909.Consts;
 using WebApplication909.Interfaces;
+using OnlineShop.Db.Interfaces;
+using OnlineShop.Db.Models;
+using WebApplication909.Helpers;
 
 namespace WebApplication909.Controllers
 {
@@ -28,7 +31,7 @@ namespace WebApplication909.Controllers
 
             if (product != null)
             {
-                _comparisonsRepository.Add(product, Constants.UserId);
+                _comparisonsRepository.Add(product.ToProductViewModel() ,Constants.UserId);
             }
 
             return RedirectToAction(nameof(Index));

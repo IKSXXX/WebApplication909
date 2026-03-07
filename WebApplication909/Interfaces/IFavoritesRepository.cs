@@ -1,4 +1,5 @@
-﻿using WebApplication909.Models;
+﻿using OnlineShop.Db.Models;
+using WebApplication909.Models;
 
 namespace WebApplication909.Interfaces
 {
@@ -7,6 +8,6 @@ namespace WebApplication909.Interfaces
         void Add(Product product, string userId);
         void Clear(string uId);
         void Delete(int productId, string userId);
-        Favorite? TryGetByUserId(string userId);
+        Favourite? TryGetByUserId(string userId);
     }
 }

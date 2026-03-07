@@ -1,40 +1,37 @@
-﻿using System.Xml.Linq;
+﻿using OnlineShop.Db.Models;
 using WebApplication909.Interfaces;
 using WebApplication909.Models;
 
 namespace WebApplication909.Repositories
 {
-    public class InMemoryFavouritesRepository : IFavoritesRepository
+    public class InMemoryFavoritesRepository : IFavoritesRepository
     {
-        private readonly List<Favorite> _favorites = [];
+        private readonly List<Favourite> _favourites = new();
 
-        public Favorite? TryGetByUserId(string userId)
+        public Favourite? TryGetByUserId(string userId)
         {
-            return _favorites.FirstOrDefault(x => x.UserId == userId);
+            return _favourites.FirstOrDefault(x => x.UserId == userId);
         }
 
         public void Add(Product product, string userId)
         {
-            var existingFavorite = TryGetByUserId(userId);
-
-            if (existingFavorite == null)
+            var existingFavourite = TryGetByUserId(userId);
+            if (existingFavourite == null)
             {
-                existingFavorite = new Favorite()
+                existingFavourite = new Favourite()
                 {
                     Id = Guid.NewGuid(),
                     UserId = userId,
-                    Items = [product]
+                    Items = new List<Product> { product }
                 };
-
-                _favorites.Add(existingFavorite);
+                _favourites.Add(existingFavourite);
             }
             else
             {
-                var existingFavoriteItem = existingFavorite.Items.FirstOrDefault(x => x.Id == product.Id);
-
-                if (existingFavoriteItem == null)
+                var existingItem = existingFavourite.Items.FirstOrDefault(x => x.Id == product.Id);
+                if (existingItem == null)
                 {
-                    existingFavorite.Items.Add(product);
+                    existingFavourite.Items.Add(product);
                 }
             }
         }
@@ -42,24 +39,28 @@ namespace WebApplication909.Repositories
         public void Delete(int productId, string userId)
         {
             var existingFavorite = TryGetByUserId(userId);
-
-            var existingFavoriteItem = existingFavorite?.Items.FirstOrDefault(x => x.Id == productId);
-
-            if (existingFavoriteItem != null)
+            if (existingFavorite != null)
             {
-                existingFavorite?.Items.Remove(existingFavoriteItem);
+                var item = existingFavorite.Items.FirstOrDefault(x => x.Id == productId);
+                if (item != null)
+                {
+                    existingFavorite.Items.Remove(item);
+                }
             }
-
         }
 
         public void Clear(string userId)
         {
             var existingFavorite = TryGetByUserId(userId);
-
             if (existingFavorite != null)
             {
-                _favorites.Remove(existingFavorite);
+                _favourites.Remove(existingFavorite);
             }
+        }
+
+        Favourite? IFavoritesRepository.TryGetByUserId(string userId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

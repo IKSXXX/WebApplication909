@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebApplication909.Interfaces;
+using OnlineShop.Db.Interfaces;
+using WebApplication909.Helpers;
 using WebApplication909.Models;
 
 namespace WebApplication909.Areas.Admin.Controllers
@@ -21,7 +22,7 @@ namespace WebApplication909.Areas.Admin.Controllers
         {
             var products = _productsRepository.GetAll();
 
-            return View(products);
+            return View(products.ToProductViewModels());
         }
 
 
@@ -32,14 +33,14 @@ namespace WebApplication909.Areas.Admin.Controllers
 
 
         [HttpPost]
-        public IActionResult Add(Product product)
+        public IActionResult Add(ProductViewModel product)
         {
             if (!ModelState.IsValid)
             {
                 return View(product);
             }
 
-            _productsRepository.Add(product);
+            _productsRepository.Add(product.ToProductDb());
 
             return RedirectToAction(nameof(Index));
         }
@@ -57,19 +58,19 @@ namespace WebApplication909.Areas.Admin.Controllers
         {
             var existingProduct = _productsRepository.TryGetById(id);
 
-            return View(existingProduct);
+            return View(existingProduct?.ToProductViewModel());
         }
 
 
         [HttpPost]
-        public IActionResult Update(Product product)
+        public IActionResult Update(ProductViewModel product)
         {
             if (!ModelState.IsValid)
             {
                 return View(product);
             }
 
-            _productsRepository.Update(product);
+            _productsRepository.Update(product.ToProductDb());
 
             return RedirectToAction(nameof(Index));
         }

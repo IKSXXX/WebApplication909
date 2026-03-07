@@ -1,6 +1,6 @@
-﻿using WebApplication909.Models;
+﻿using OnlineShop.Db.Models;
 
-namespace WebApplication909.Interfaces
+namespace OnlineShop.Db.Interfaces
 {
     public interface IProductsRepository
     {

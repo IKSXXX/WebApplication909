@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebApplication909.Interfaces;
+using OnlineShop.Db.Interfaces;
+using WebApplication909.Helpers;
 using WebApplication909.Models;
 
 namespace WebApplication909.Views.Shared.ViewComponents.CartViewComponents
@@ -8,8 +9,8 @@ namespace WebApplication909.Views.Shared.ViewComponents.CartViewComponents
     {
         public IViewComponentResult Invoke()
         {
-            var cart = cartsRepository.TryGetByUserId(Constants.UserId);
-            var productsCount = cart?.Quantity ?? 0;
+            var cart = cartsRepository.TryGetByUserId(Constants.UserId).ToCartViewModel();
+            var productsCount = cart?.Items.Count() ?? 0;
 
             return View("Cart", productsCount);
         }
