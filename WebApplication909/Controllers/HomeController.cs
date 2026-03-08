@@ -1,32 +1,33 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using WebApplication909.Interfaces;
-using WebApplication909.Models;
+using WebApplication909.Helpers;      // для ToProductViewModels()
 using OnlineShop.Db.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace WebApplication909.Controllers
 {
-    public class HomeController(IProductsRepository productsRepository) : Controller
+    public class HomeController : Controller
     {
-        private readonly IProductsRepository productsRepository = productsRepository;
+        private readonly IProductsRepository productsRepository;
+
+        public HomeController(IProductsRepository productsRepository)
+        {
+            this.productsRepository = productsRepository;
+        }
 
         public IActionResult Index()
         {
-            var products = productsRepository.GetAll();
-
-            return View(products);
+            var products = productsRepository.GetAll();                   // List<Product>
+            var productViewModels = products.ToProductViewModels();       // преобразуем в List<ProductViewModel>
+            return View(productViewModels);                               // передаём правильный тип
         }
+
         public IActionResult Search(string query)
         {
-            if (query == null)
-            {
+            if (string.IsNullOrEmpty(query))
                 return View();
-            }
 
-            var products = productsRepository.Search(query);
-
-            return View(products);
+            var products = productsRepository.Search(query);              // List<Product>
+            var productViewModels = products.ToProductViewModels();       // преобразование
+            return View(productViewModels);
         }
     }
 }
