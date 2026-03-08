@@ -8,24 +8,25 @@ namespace OnlineShop.Db
         public DatabaseContext(DbContextOptions<DatabaseContext> options)
             : base(options)
         {
-            Database.EnsureCreated();   // Создаёт базу данных при первом обращении
+            // НЕ вызываем EnsureCreated здесь!
         }
 
         public DbSet<Product> Products { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
-        //public DbSet<Order> Orders { get; set; }
-        //public DbSet<DeliveryUser> DeliveryUsers { get; set; }
-        //public DbSet<Favorite> Favorites { get; set; }
-        //public DbSet<Comparison> Comparisons { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Связь Cart → CartItem (один ко многим)
+            // Связь Cart → CartItem
             modelBuilder.Entity<CartItem>()
                 .HasOne(ci => ci.Cart)
                 .WithMany(c => c.Items)
                 .HasForeignKey(ci => ci.CartId);
+
+            // Точность для decimal (важно для PostgreSQL)
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Cost)
+                .HasPrecision(18, 2);
 
             base.OnModelCreating(modelBuilder);
         }

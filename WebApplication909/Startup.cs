@@ -8,11 +8,9 @@ using WebApplication909.Interfaces;
 using WebApplication909.Repositories;
 using WebApplication909.Areas.Admin.Interfaces;
 using WebApplication909.Areas.Admin.Repositories;
-using Microsoft.EntityFrameworkCore;
 using OnlineShop.Db;
 using OnlineShop.Db.Interfaces;
 using OnlineShop.Db.Repositories;
-using OnlineShop.Db.Models; // если потребуется в этом файле
 
 namespace WebApplication909
 {
@@ -29,20 +27,19 @@ namespace WebApplication909
         {
             services.AddControllersWithViews();
 
-            // Регистрация DbContext
+            // Подключение к PostgreSQL
             var connectionString = Configuration.GetConnectionString("OnlineShopConnection");
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseSqlServer(connectionString)); // Используем SQL Server
+                options.UseNpgsql(connectionString));   // ВАЖНО: UseNpgsql
 
-            // Регистрация репозиториев (Scoped, так как DbContext Scoped)
+            // Регистрация репозиториев
             services.AddScoped<IProductsRepository, DbProductsRepository>();
             services.AddScoped<ICartsRepository, DbCartsRepository>();
-            // Добавьте остальные репозитории по аналогии
-            // services.AddScoped<IOrdersRepository, DbOrdersRepository>();
             services.AddScoped<IFavoritesRepository, InMemoryFavoritesRepository>();
-            // services.AddScoped<IComparisonsRepository, DbComparisonsRepository>();
-            // services.AddScoped<IUsersRepository, DbUsersRepository>(); (если есть)
-            // services.AddScoped<IRolesRepository, DbRolesRepository>(); (если есть)
+            services.AddScoped<IComparisonsRepository, InMemoryComparisonsRepository>();
+            services.AddScoped<IOrdersRepository, InMemoryOrdersRepository>();
+            services.AddScoped<IUsersRepository, InMemoryUsersRepository>();
+            services.AddScoped<IRolesRepository, InMemoryRolesRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -72,6 +69,11 @@ namespace WebApplication909
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            // Применение миграций (создание таблиц, если их нет)
+            using var scope = app.ApplicationServices.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+            dbContext.Database.Migrate();   // Создаст таблицы через миграции
         }
     }
 }
