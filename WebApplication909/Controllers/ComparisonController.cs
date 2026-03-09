@@ -31,7 +31,7 @@ namespace WebApplication909.Controllers
 
             if (product != null)
             {
-                _comparisonsRepository.Add(product.ToProductViewModel() ,Constants.UserId);
+                _comparisonsRepository.Add(product ,Constants.UserId);
             }
 
             return RedirectToAction(nameof(Index));

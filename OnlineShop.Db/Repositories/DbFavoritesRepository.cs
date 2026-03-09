@@ -8,11 +8,11 @@ using WebApplication909.Models;
 
 namespace OnlineShop.Db.Repositories
 {
-    public class DbFavoritesRepository : IFavoritesRepository
+    public class DbFavouritesRepository : IFavoritesRepository
     {
         private readonly DatabaseContext _context;
 
-        public DbFavoritesRepository(DatabaseContext context)
+        public DbFavouritesRepository(DatabaseContext context)
         {
             _context = context;
         }

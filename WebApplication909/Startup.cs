@@ -35,8 +35,8 @@ namespace WebApplication909
             // Регистрация репозиториев
             services.AddScoped<IProductsRepository, DbProductsRepository>();
             services.AddScoped<ICartsRepository, DbCartsRepository>();
-            services.AddScoped<IFavoritesRepository, InMemoryFavoritesRepository>();
-            services.AddScoped<IComparisonsRepository, InMemoryComparisonsRepository>();
+            services.AddScoped<IFavoritesRepository, DbFavouritesRepository>();
+            services.AddScoped<IComparisonsRepository, DbComparisonsRepository>();
             services.AddScoped<IOrdersRepository, InMemoryOrdersRepository>();
             services.AddScoped<IUsersRepository, InMemoryUsersRepository>();
             services.AddScoped<IRolesRepository, InMemoryRolesRepository>();
