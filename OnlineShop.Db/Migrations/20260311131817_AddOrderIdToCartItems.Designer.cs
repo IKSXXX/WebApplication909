@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OnlineShop.Db;
@@ -11,9 +12,11 @@ using OnlineShop.Db;
 namespace OnlineShop.Db.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20260311131817_AddOrderIdToCartItems")]
+    partial class AddOrderIdToCartItems
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,36 +24,6 @@ namespace OnlineShop.Db.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("ComparisonProduct", b =>
-                {
-                    b.Property<Guid>("ComparisonId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("ItemsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("ComparisonId", "ItemsId");
-
-                    b.HasIndex("ItemsId");
-
-                    b.ToTable("ComparisonProduct", (string)null);
-                });
-
-            modelBuilder.Entity("FavoriteProduct", b =>
-                {
-                    b.Property<Guid>("FavoriteId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("ItemsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("FavoriteId", "ItemsId");
-
-                    b.HasIndex("ItemsId");
-
-                    b.ToTable("FavoriteProduct", (string)null);
-                });
 
             modelBuilder.Entity("OnlineShop.Db.Models.Cart", b =>
                 {
@@ -158,9 +131,11 @@ namespace OnlineShop.Db.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid?>("ComparisonId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("Cost")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -173,6 +148,8 @@ namespace OnlineShop.Db.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ComparisonId");
 
                     b.ToTable("Products");
                 });
@@ -206,36 +183,6 @@ namespace OnlineShop.Db.Migrations
                     b.ToTable("Favorites");
                 });
 
-            modelBuilder.Entity("ComparisonProduct", b =>
-                {
-                    b.HasOne("WebApplication909.Models.Comparison", null)
-                        .WithMany()
-                        .HasForeignKey("ComparisonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OnlineShop.Db.Models.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ItemsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("FavoriteProduct", b =>
-                {
-                    b.HasOne("WebApplication909.Models.Favorite", null)
-                        .WithMany()
-                        .HasForeignKey("FavoriteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("OnlineShop.Db.Models.Product", null)
-                        .WithMany()
-                        .HasForeignKey("ItemsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("OnlineShop.Db.Models.CartItem", b =>
                 {
                     b.HasOne("OnlineShop.Db.Models.Cart", "Cart")
@@ -246,8 +193,7 @@ namespace OnlineShop.Db.Migrations
 
                     b.HasOne("OnlineShop.Db.Models.Order", "Order")
                         .WithMany("Items")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("OrderId");
 
                     b.HasOne("OnlineShop.Db.Models.Product", "Product")
                         .WithMany()
@@ -271,12 +217,24 @@ namespace OnlineShop.Db.Migrations
                     b.Navigation("DeliveryUser");
                 });
 
+            modelBuilder.Entity("OnlineShop.Db.Models.Product", b =>
+                {
+                    b.HasOne("WebApplication909.Models.Comparison", null)
+                        .WithMany("Items")
+                        .HasForeignKey("ComparisonId");
+                });
+
             modelBuilder.Entity("OnlineShop.Db.Models.Cart", b =>
                 {
                     b.Navigation("Items");
                 });
 
             modelBuilder.Entity("OnlineShop.Db.Models.Order", b =>
+                {
+                    b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("WebApplication909.Models.Comparison", b =>
                 {
                     b.Navigation("Items");
                 });

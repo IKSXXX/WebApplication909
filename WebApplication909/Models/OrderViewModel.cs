@@ -3,7 +3,7 @@ using Microsoft.Build.Framework;
 
 namespace WebApplication909.Models;
 
-public class Order
+public class OrderViewModel
 {
     public Guid Id { get; set; }
 
@@ -14,7 +14,7 @@ public class Order
     public List<CartItemViewModel> Items { get; set; }
 
     [Required]
-    public DeliveryUser DeliveryUser { get; set; }
+    public DeliveryUserViewModel DeliveryUser { get; set; }
 
     [ValidateNever]
     public DateTime CreationDateTime { get; set; }
@@ -24,5 +24,5 @@ public class Order
     public int? ItemsQuantity => Items?.Sum(item => item.Quantity);
 
     [Required]
-    public OrderStatus Status { get; set; }
+    public OrderStatusViewModel Status { get; set; }
 }

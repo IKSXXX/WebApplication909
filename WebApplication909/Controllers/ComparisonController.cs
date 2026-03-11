@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApplication909.Consts;
-using WebApplication909.Interfaces;
 using OnlineShop.Db.Interfaces;
 using OnlineShop.Db.Models;
 using WebApplication909.Helpers;

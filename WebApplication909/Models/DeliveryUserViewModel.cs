@@ -4,7 +4,7 @@ using WebApplication909.Helpers;
 
 namespace WebApplication909.Models
 {
-    public class DeliveryUser
+    public class DeliveryUserViewModel
     {
         [Display(Name = "Имя покупателя", Prompt = "Ваше имя")]
         [Required(ErrorMessage = "Не указано имя покупателя")]

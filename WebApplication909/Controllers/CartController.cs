@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebApplication909.Interfaces;
 using OnlineShop.Db.Repositories;
 using OnlineShop.Db.Interfaces;
+using WebApplication909.Helpers;
 
 namespace WebApplication909.Controllers
 {
@@ -12,8 +12,8 @@ namespace WebApplication909.Controllers
 
         public IActionResult Index()
         {
-            var vart = cartRepository.TryGetByUserId(Constants.UserId);
-            return View(vart);
+            var cart = cartRepository.TryGetByUserId(Constants.UserId);
+            return View(cart.ToCartViewModel());
         }
         public ActionResult Add(int productId)
         {

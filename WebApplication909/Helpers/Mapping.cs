@@ -43,6 +43,9 @@ namespace WebApplication909.Helpers
         }
         #endregion
 
+        #region Favorite
+
+        #endregion
 
         #region Cart
         public static List<CartItemViewModel> ToCartItemViewModels(this List<CartItem> cartDbItems)
@@ -79,6 +82,81 @@ namespace WebApplication909.Helpers
                 Id = cartDb.Id,
                 UserId = cartDb.UserId,
                 Items = cartDb.Items.ToCartItemViewModels(),
+            };
+        }
+        #endregion
+        public static List<FavoriteViewModel> ToFavoriteViewModels(this List<Favorite> favoritesDb)
+        {
+            var favoritesViewModel = new List<FavoriteViewModel>();
+
+            foreach (var cartDbItem in favoritesDb)
+            {
+                favoritesViewModel.Add(cartDbItem.ToFavoriteViewModel());
+            }
+
+            return favoritesViewModel;
+        }
+
+        public static FavoriteViewModel? ToFavoriteViewModel(this Favorite? favorite)
+        {
+            if (favorite == null) return null;
+            return new FavoriteViewModel
+            {
+                Id = favorite.Id,
+                UserId = favorite.UserId,
+                Items = favorite.Items?.Select(p => p.ToProductViewModel()).ToList() ?? new()
+            };
+        }
+
+        #region Order
+        public static List<OrderViewModel> ToOrderViewModels(this List<Order> ordersDb)
+        {
+            var ordersViewModel = new List<OrderViewModel>();
+
+            foreach (var orderDb in ordersDb)
+            {
+                ordersViewModel.Add(orderDb.ToOrderViewModel());
+            }
+
+            return ordersViewModel;
+        }
+
+        public static OrderViewModel ToOrderViewModel(this Order orderDb)
+        {
+            return new OrderViewModel()
+            {
+                Id = orderDb.Id,
+                UserId = orderDb.UserId,
+                Items = orderDb.Items.ToCartItemViewModels(),
+                DeliveryUser = orderDb.DeliveryUser.ToDeliveryUserViewModel(),
+                CreationDateTime = orderDb.CreationDateTime,
+                Status = (OrderStatusViewModel)orderDb.Status,
+            };
+        }
+
+        public static DeliveryUserViewModel ToDeliveryUserViewModel(this DeliveryUser deliveryUserDb)
+        {
+            return new DeliveryUserViewModel()
+            {
+                Id = deliveryUserDb.Id,
+                Name = deliveryUserDb.Name,
+                Address = deliveryUserDb.Address,
+                Phone = deliveryUserDb.Phone,
+                Date = deliveryUserDb.Date,
+                Comment = deliveryUserDb.Comment
+            };
+        }
+
+        public static DeliveryUser ToDeliveryUserDb(this DeliveryUserViewModel deliveryUser)
+        {
+            return new DeliveryUser()
+            {
+                Id = deliveryUser.Id,
+                Name = deliveryUser.Name,
+                Address = deliveryUser.Address,
+                Phone = deliveryUser.Phone,
+                Date = deliveryUser.Date,
+                Comment = deliveryUser.Comment
             };
         }
         #endregion

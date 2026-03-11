@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using WebApplication909.Interfaces;
-using WebApplication909.Repositories;
 using WebApplication909.Areas.Admin.Interfaces;
 using WebApplication909.Areas.Admin.Repositories;
 using OnlineShop.Db;
@@ -37,7 +35,7 @@ namespace WebApplication909
             services.AddScoped<ICartsRepository, DbCartsRepository>();
             services.AddScoped<IFavoritesRepository, DbFavouritesRepository>();
             services.AddScoped<IComparisonsRepository, DbComparisonsRepository>();
-            services.AddScoped<IOrdersRepository, InMemoryOrdersRepository>();
+            services.AddScoped<IOrdersRepository, DbOrdersRepository>();
             services.AddScoped<IUsersRepository, InMemoryUsersRepository>();
             services.AddScoped<IRolesRepository, InMemoryRolesRepository>();
         }

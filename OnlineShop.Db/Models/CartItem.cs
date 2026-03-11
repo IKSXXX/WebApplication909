@@ -7,5 +7,7 @@
         public int Quantity { get; set; }
         public Guid CartId { get; set; } // внешний ключ
         public Cart Cart { get; set; }    // навигационное свойство
+        public Guid? OrderId { get; set; }
+        public Order? Order { get; set; }
     }
 }

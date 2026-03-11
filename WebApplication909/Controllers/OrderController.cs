@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
-using WebApplication909.Models;
-using System.Security.Cryptography.X509Certificates;
-using System.Runtime.Serialization;
-using WebApplication909.Interfaces;
 using OnlineShop.Db.Interfaces;
+using OnlineShop.Db.Models;
+using System.Runtime.Serialization;
+using System.Security.Cryptography.X509Certificates;
 using WebApplication909.Helpers;
+using WebApplication909.Models;
 
 namespace WebApplication909.Controllers
 {
@@ -26,7 +26,7 @@ namespace WebApplication909.Controllers
 
             var cartView = cart.ToCartViewModel();
 
-            var order = new Order()
+            var order = new OrderViewModel()
             {
                 Items = cartView?.Items ?? [],
             };
@@ -34,8 +34,13 @@ namespace WebApplication909.Controllers
             return View(order);
         }
 
+        public IActionResult Success()
+        {
+            return View();
+        }
+
         [HttpPost]
-        public IActionResult Buy(Order order)
+        public IActionResult Buy(OrderViewModel order)
         {
             var cart = _cartsRepository.TryGetByUserId(Constants.UserId);
 
@@ -43,10 +48,8 @@ namespace WebApplication909.Controllers
             {
                 return View(nameof(Index), order);
             }
-            var cartView = cart.ToCartViewModel();
 
-            order.Items = cartView.Items;
-
+            order.Items = cart.Items.ToCartItemViewModels();
             order.UserId = Constants.UserId;
 
             if (!ModelState.IsValid)
@@ -54,16 +57,21 @@ namespace WebApplication909.Controllers
                 return View(nameof(Index), order);
             }
 
-            _ordersRepository.Add(order);
+            var orderDb = new Order()
+            {
+                Id = order.Id,
+                UserId = order.UserId,
+                Items = cart.Items,
+                DeliveryUser = order.DeliveryUser.ToDeliveryUserDb(),
+                CreationDateTime = order.CreationDateTime,
+                Status = (OrderStatus)order.Status,
+            };
+
+            _ordersRepository.Add(orderDb);
 
             _cartsRepository.Clear(Constants.UserId);
 
             return RedirectToAction(nameof(Success));
-        }
-
-        public IActionResult Success()
-        {
-            return View();
         }
 
     }

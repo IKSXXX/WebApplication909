@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OnlineShop.Db.Interfaces;
 using OnlineShop.Db.Models;
-using WebApplication909.Interfaces;
+using WebApplication909.Helpers;
 
 namespace WebApplication909.Controllers
 {
@@ -14,7 +14,7 @@ namespace WebApplication909.Controllers
         {
             var favorites = _favoritesRepository.TryGetByUserId(Constants.UserId);
 
-            return View(favorites);
+            return View(favorites.ToFavoriteViewModel());
         }
 
         public IActionResult Add(int productId)
