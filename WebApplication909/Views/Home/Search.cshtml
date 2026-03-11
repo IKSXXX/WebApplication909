@@ -1,22 +1,31 @@
 ﻿@model List<ProductViewModel>
 @{
-    ViewData["Title"] = "Главная";
+    ViewData["Title"] = "Результаты поиска";
 }
 
-@await Html.PartialAsync("SearchBlock")
+<section class="mb-4">
+    @await Html.PartialAsync("SearchBlock")
+</section>
 
-<div class="text-center text-uppercase text-success mb-5 mt-5">
-    <h2 class="row-title">Товары, соответствующие запросу</h2>
-</div>
+<section>
+    <h2 class="text-success mb-4">
+        <i class="fas fa-search me-2"></i>Результаты поиска
+        @if (ViewData["Query"] != null)
+        {
+            <span class="text-muted h5">по запросу "@ViewData["Query"]"</span>
+        }
+    </h2>
 
-<div class="row justify-content-center mt-3">
-    @await Html.PartialAsync("ProductsCatalog", @Model)
-</div>
-
-<div class="text-center m-5">
-    <a class="btn btn-outline-success"
-       asp-controller="Home"
-       asp-action="Index">
-        Отобразить весь каталог товаров
-    </a>
-</div>
+    @if (Model != null && Model.Any())
+    {
+        @await Html.PartialAsync("ProductsCatalog", Model)
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+            <h4>По вашему запросу ничего не найдено</h4>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-success mt-3">Вернуться в каталог</a>
+        </div>
+    }
+</section>

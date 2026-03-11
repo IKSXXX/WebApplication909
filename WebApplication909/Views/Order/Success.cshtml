@@ -1,19 +1,16 @@
 ﻿@{
-    ViewData["Title"] = "Оплата заказа";
+    ViewData["Title"] = "Заказ оформлен";
 }
 
-<div class="text-center text-uppercase text-success mb-5 mt-5">
-    <h2 class="row-title">Оплата заказа</h2>
-</div>
-
-<div class="text-center">
-    <h2 class="row-title">Заказ успешно оплачен! Благодарим за покупку!</h2>
-</div>
-
-<div class="text-center m-5">
-    <a class="btn btn-outline-success"
-       asp-controller="Home"
-       asp-action="Index">
-        Продолжить покупки
-    </a>
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6 text-center">
+        <div class="card shadow-lg border-0 rounded-4 p-5 mt-5">
+            <i class="fas fa-check-circle text-success fa-5x mb-4"></i>
+            <h1 class="display-5 fw-bold text-success">Спасибо за покупку!</h1>
+            <p class="lead">Ваш заказ успешно оформлен. Мы свяжемся с вами для подтверждения.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-success btn-lg mt-4">
+                <i class="fas fa-store me-2"></i>Вернуться в магазин
+            </a>
+        </div>
+    </div>
 </div>

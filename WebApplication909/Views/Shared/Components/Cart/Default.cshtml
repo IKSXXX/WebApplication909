@@ -1,0 +1,16 @@
+﻿@model CartViewModel
+@{
+    var itemsCount = Model?.Items?.Sum(i => i.Quantity) ?? 0;
+    var total = Model?.TotalCost ?? 0;
+}
+
+<a class="nav-link position-relative" asp-controller="Cart" asp-action="Index">
+    <i class="fas fa-shopping-cart fa-lg"></i>
+    @if (itemsCount > 0)
+    {
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            @itemsCount
+        </span>
+    }
+    <span class="d-none d-lg-inline ms-1">@total.ToString("c")</span>
+</a>

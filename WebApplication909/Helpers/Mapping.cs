@@ -45,6 +45,28 @@ namespace WebApplication909.Helpers
 
         #region Favorite
 
+        public static List<FavoriteViewModel> ToFavoriteViewModels(this List<Favorite> favoritesDb)
+        {
+            var favoritesViewModel = new List<FavoriteViewModel>();
+
+            foreach (var cartDbItem in favoritesDb)
+            {
+                favoritesViewModel.Add(cartDbItem.ToFavoriteViewModel());
+            }
+
+            return favoritesViewModel;
+        }
+
+        public static FavoriteViewModel? ToFavoriteViewModel(this Favorite? favorite)
+        {
+            if (favorite == null) return null;
+            return new FavoriteViewModel
+            {
+                Id = favorite.Id,
+                UserId = favorite.UserId,
+                Items = favorite.Items?.Select(p => p.ToProductViewModel()).ToList() ?? new()
+            };
+        }
         #endregion
 
         #region Cart
@@ -85,28 +107,6 @@ namespace WebApplication909.Helpers
             };
         }
         #endregion
-        public static List<FavoriteViewModel> ToFavoriteViewModels(this List<Favorite> favoritesDb)
-        {
-            var favoritesViewModel = new List<FavoriteViewModel>();
-
-            foreach (var cartDbItem in favoritesDb)
-            {
-                favoritesViewModel.Add(cartDbItem.ToFavoriteViewModel());
-            }
-
-            return favoritesViewModel;
-        }
-
-        public static FavoriteViewModel? ToFavoriteViewModel(this Favorite? favorite)
-        {
-            if (favorite == null) return null;
-            return new FavoriteViewModel
-            {
-                Id = favorite.Id,
-                UserId = favorite.UserId,
-                Items = favorite.Items?.Select(p => p.ToProductViewModel()).ToList() ?? new()
-            };
-        }
 
         #region Order
         public static List<OrderViewModel> ToOrderViewModels(this List<Order> ordersDb)
@@ -160,6 +160,5 @@ namespace WebApplication909.Helpers
             };
         }
         #endregion
-
     }
 }

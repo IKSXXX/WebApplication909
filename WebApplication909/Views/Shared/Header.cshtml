@@ -1,48 +1,86 @@
 ﻿<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">OnlineShopWebApp</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-success" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="fas fa-store me-2"></i>OnlineShop
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                    aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="fas fa-home me-1"></i>Главная
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">
+                            <i class="fas fa-lock me-1"></i>Конфиденциальность
+                        </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="Admin" asp-controller="Order" asp-action="Index">
+                            <i class="fas fa-cog"></i> Админ-панель
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                    <!-- Корзина (ViewComponent) -->
+                    <li class="nav-item me-2">
                         @await Component.InvokeAsync("Cart")
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark"
-                           asp-area=""
-                           asp-controller="Account"
-                           asp-action="Authorization">
-                            Авторизация
+                    <!-- Избранное -->
+                    <li class="nav-item me-2">
+                        <a class="nav-link position-relative" asp-area="" asp-controller="Favorite" asp-action="Index">
+                            <i class="fas fa-heart text-danger"></i>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark"
-                           asp-area=""
-                           asp-controller="Account"
-                           asp-action="Registration">
-                            Регистрация
+                    <!-- Сравнение -->
+                    <li class="nav-item me-2">
+                        <a class="nav-link" asp-area="" asp-controller="Comparison" asp-action="Index">
+                            <i class="fas fa-balance-scale"></i>
                         </a>
                     </li>
-
-                    <li class="nav-item">
-                        <!-- Исправлено: теперь ведёт в область Admin на список заказов -->
-                        <a class="nav-link text-dark"
-                           asp-area="Admin"
-                           asp-controller="Order"
-                           asp-action="Index">
-                            Панель администратора
-                        </a>
-                    </li>
+                    <!-- Профиль и админка -->
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle"></i> @User.Identity.Name
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li>
+                                    <a class="dropdown-item" asp-area="Admin" asp-controller="Order" asp-action="Index">
+                                        <i class="fas fa-cog me-2"></i>Панель администратора
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Выход
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Authorization">
+                                <i class="fas fa-sign-in-alt me-1"></i>Вход
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Registration">
+                                <i class="fas fa-user-plus me-1"></i>Регистрация
+                            </a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>

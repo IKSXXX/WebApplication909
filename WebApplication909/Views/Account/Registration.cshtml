@@ -1,55 +1,66 @@
 ﻿@model Registration
 @{
-    ViewData["Title"] = "Регистрация пользователя";
+    ViewData["Title"] = "Регистрация";
 }
 
-<div class="text-center text-uppercase text-success mb-5 mt-5">
-    <h2 class="row-title">Регистрация</h2>
-</div>
-<form method="post">
-    <div class="row justify-content-center mt-3">
-        <div class="col-6 mb-3">
-            <div class="text-danger fw-bold text-uppercase" asp-validation-summary="All"></div>
-            <p>
-                <label class="form-label" asp-for="FirstName"></label><br />
-                <input class="form-control" asp-for="FirstName" />
-                <span asp-validation-for="FirstName"></span>
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+            <div class="card-header bg-success text-white text-center py-4">
+                <i class="fas fa-user-plus fa-3x mb-2"></i>
+                <h2 class="mb-0">Регистрация</h2>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-            </p>
-            <p>
-                <label class="form-label" asp-for="LastName"></label><br />
-                <input class="form-control" asp-for="LastName" />
-                <span asp-validation-for="LastName"></span>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="FirstName" class="form-label fw-semibold"></label>
+                            <input asp-for="FirstName" class="form-control" placeholder="Иван">
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="LastName" class="form-label fw-semibold"></label>
+                            <input asp-for="LastName" class="form-control" placeholder="Петров">
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
 
-            </p>
-            <p>
-                <label class="form-label" asp-for="Phone"></label><br />
-                <input class="form-control" asp-for="Phone" />
-                <span asp-validation-for="Phone"></span>
-            </p>
-            <p>
-                <label class="form-label" asp-for="Login"></label><br />
-                <input class="form-control" asp-for="Login" />
-                <span asp-validation-for="Login"></span>
-            </p>
-            <p>
-                <label class="form-label" asp-for="Password"></label><br />
-                <input class="form-control" asp-for="Password" />
-                <span asp-validation-for="Password"></span>
-            </p>
-            <p>
-                <label class="form-label" asp-for="ConfirmPassword"></label><br />
-                <input class="form-control" asp-for="ConfirmPassword" />
-                <span asp-validation-for="ConfirmPassword"></span>
-            </p>
+                    <div class="mb-3">
+                        <label asp-for="Phone" class="form-label fw-semibold"></label>
+                        <input asp-for="Phone" class="form-control" placeholder="+7 (999) 123-45-67">
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Login" class="form-label fw-semibold"></label>
+                        <input asp-for="Login" class="form-control" placeholder="name@example.com">
+                        <span asp-validation-for="Login" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Password" class="form-label fw-semibold"></label>
+                            <input asp-for="Password" class="form-control" placeholder="••••••">
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ConfirmPassword" class="form-label fw-semibold"></label>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="••••••">
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 py-3 fw-bold mt-3">
+                        <i class="fas fa-check-circle me-2"></i>Зарегистрироваться
+                    </button>
+                </form>
+            </div>
+            <div class="card-footer bg-light text-center py-3">
+                <span class="text-muted">Уже есть аккаунт?</span>
+                <a asp-controller="Account" asp-action="Authorization" class="text-success fw-bold text-decoration-none">Войти</a>
+            </div>
         </div>
     </div>
-    <div class="text-center m-3">
-        <button class="btn btn-outline-success" type="submit"
-                asp-area=""
-                asp-controller="Account"
-                asp-action="Registration">
-            Зарегистрироваться
-        </button>
-    </div>
-</form>
+</div>

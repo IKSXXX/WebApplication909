@@ -3,13 +3,29 @@
     ViewData["Title"] = "Главная";
 }
 
-@await Html.PartialAsync("SearchBlock")
+<!-- Баннер / карусель (можно добавить позже) -->
+<section class="mb-5">
+    <div class="bg-success text-white p-5 rounded-4 shadow">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold">Добро пожаловать в OnlineShop!</h1>
+                <p class="lead">Лучшие товары по лучшим ценам</p>
+                <a asp-controller="Home" asp-action="Search" class="btn btn-light btn-lg">Начать покупки</a>
+            </div>
+            <div class="col-lg-6 text-end">
+                <i class="fas fa-store fa-6x opacity-50"></i>
+            </div>
+        </div>
+    </div>
+</section>
 
-<div class="text-center text-uppercase text-success mb-5 mt-5">
-    <h2 class="row-title">Каталог товаров</h2>
-</div>
+<!-- Поиск -->
+<section class="mb-4">
+    @await Html.PartialAsync("SearchBlock")
+</section>
 
-<div class="row mt-3">
-    @await Html.PartialAsync("ProductsCatalog", @Model)
-</div>
-
+<!-- Каталог -->
+<section>
+    <h2 class="text-success mb-4"><i class="fas fa-list me-2"></i>Каталог товаров</h2>
+    @await Html.PartialAsync("ProductsCatalog", Model)
+</section>

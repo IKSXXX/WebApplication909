@@ -1,65 +1,48 @@
 ﻿@model ProductViewModel
 @{
-    ViewData["Title"] = "Описание товара";
+    ViewData["Title"] = Model?.Name ?? "Товар";
 }
-
-<div class="text-center text-uppercase text-success mb-5 mt-5">
-    <h2 class="row-title">Описание товара</h2>
-</div>
 
 @if (Model != null)
 {
-    ViewData["Title"] = @Model.Name;
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Главная</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
 
-    <div class="row justify-content-center">
-        <div class="col-3 mb-3">
-            <div class="card h-100 bg-light">
-                <img class="card-img-top" src=@Model.PhotoPath alt="Фото товара">
-                <div class="card-body text-center">
-                    <h4>@Model.Name</h4>
-                    <h2 class="text-danger">@Model.Cost.ToString("c")</h2>
-
-                    <a class="btn btn-success"
-                       asp-controller="Cart"
-                       asp-action="Add"
-                       asp-route-productId="@Model.Id">
-                        Добавить в корзину
-                    </a>
-                    <a class="btn btn-outline-secondary mt-3"
-                       asp-controller="Favorite"
-                       asp-action="Add"
-                       asp-route-productId="@Model.Id">
-                        Добавить в избранное
-                    </a>
-                    <a class="btn btn-outline-secondary mt-3"
-                       asp-controller="Comparison"
-                       asp-action="Add"
-                       asp-route-productId="@Model.Id">
-                        Добавить в сравнение
-                    </a>
-                </div>
+    <div class="row">
+        <div class="col-md-5 mb-4">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <img src="@Model.PhotoPath" class="img-fluid" alt="@Model.Name">
             </div>
         </div>
-        <div class="col-6 mb-3">
-            <div class="card h-100 bg-light">
-                <div class="card-body">
-                    <h6>@Model.Description</h6>
+        <div class="col-md-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h1 class="display-5 fw-bold text-success">@Model.Name</h1>
+                <p class="lead">@Model.Description</p>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="h2 fw-bold text-danger">@Model.Cost.ToString("c")</span>
+                    <div>
+                        <a asp-controller="Cart" asp-action="Add" asp-route-productId="@Model.Id" class="btn btn-success btn-lg me-2">
+                            <i class="fas fa-shopping-cart me-2"></i>В корзину
+                        </a>
+                        <a asp-controller="Favorite" asp-action="Add" asp-route-productId="@Model.Id" class="btn btn-outline-danger btn-lg me-2" title="В избранное">
+                            <i class="fas fa-heart"></i>
+                        </a>
+                        <a asp-controller="Comparison" asp-action="Add" asp-route-productId="@Model.Id" class="btn btn-outline-secondary btn-lg" title="Сравнить">
+                            <i class="fas fa-balance-scale"></i>
+                        </a>
+                    </div>
                 </div>
+                <p class="text-muted"><i class="fas fa-tag me-2"></i>Артикул: @Model.Id</p>
             </div>
         </div>
     </div>
 }
 else
 {
-    <div class="text-center">
-        <h2>Такого товара не существует!</h2>
-    </div>
+    <div class="alert alert-warning">Товар не найден</div>
 }
-
-<div class="text-center m-5">
-    <a class="btn btn-outline-success"
-       asp-controller="Home"
-       asp-action="Index">
-        Продолжить покупки
-    </a>
-</div>

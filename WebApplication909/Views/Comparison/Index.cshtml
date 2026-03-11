@@ -1,67 +1,72 @@
-﻿@model Comparison
-
+﻿@model ComparisonViewModel
 @{
     ViewData["Title"] = "Сравнение товаров";
 }
 
-<div class="text-center text-uppercase text-success mb-5 mt-5">
-    <h2 class="row-title">Сравнение товаров</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="text-success"><i class="fas fa-balance-scale me-3"></i>Сравнение товаров</h1>
+    @if (Model?.Items?.Any() == true)
+    {
+        <a asp-action="Clear" class="btn btn-outline-danger" onclick="return confirm('Очистить список сравнения?')">
+            <i class="fas fa-trash-alt me-2"></i>Очистить всё
+        </a>
+    }
 </div>
 
-@if (Model != null && Model.Items?.Count > 0)
+@if (Model?.Items?.Any() == true)
 {
-    <div class="row justify-content-center mt-3">
-        @foreach (var product in Model.Items)
-        {
-            <div class="col-3 mb-3">
-                <div class="card shadow">
-                    <img class="card-img-top" src=@product.PhotoPath alt="...">
-                    <div class="card-body text-center">
-                        <a class="text-success"
-                           asp-controller="Product"
-                           asp-action="Index"
-                           asp-route-id="@product.Id">
-                            <h5>@product.Name</h5>
-                        </a>
-                        <h2 class="text-danger">@product.Cost.ToString("c")</h2>
-                        <a class="btn btn-success"
-                           asp-controller="Cart"
-                           asp-action="Add"
-                           asp-route-productId="@product.Id">
-                            Добавить в корзину
-                        </a>
-                        <a class="btn btn-outline-danger mt-3"
-                           asp-controller="Comparison"
-                           asp-action="Delete"
-                           asp-route-productId="@product.Id">
-                            Убрать из сравнения
-                        </a>
-                    </div>
-                </div>
-            </div>
-        }
-
-        <div class="text-center mt-5">
-            <a class="btn btn-outline-danger"
-               asp-controller="Comparison"
-               asp-action="Clear">
-                Очистить список сравнения
-            </a>
-        </div>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle comparison-table">
+            <thead class="table-success">
+                <tr>
+                    <th style="width: 200px;">Характеристика</th>
+                    @foreach (var product in Model.Items)
+                    {
+                        <th class="text-center">
+                            <img src="@product.PhotoPath" alt="@product.Name" class="img-thumbnail mb-2" style="max-height: 120px;">
+                            <br>
+                            <a asp-controller="Product" asp-action="Index" asp-route-id="@product.Id" class="text-success fw-bold text-decoration-none">
+                                @product.Name
+                            </a>
+                            <div class="mt-2">
+                                <a asp-controller="Cart" asp-action="Add" asp-route-productId="@product.Id" class="btn btn-sm btn-success me-1" title="В корзину">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-productId="@product.Id" class="btn btn-sm btn-outline-danger" title="Убрать">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="fw-semibold">Цена</td>
+                    @foreach (var product in Model.Items)
+                    {
+                        <td class="text-center fw-bold text-danger">@product.Cost.ToString("c")</td>
+                    }
+                </tr>
+                <tr>
+                    <td class="fw-semibold">Описание</td>
+                    @foreach (var product in Model.Items)
+                    {
+                        <td class="text-center">@product.Description</td>
+                    }
+                </tr>
+                <!-- Добавьте другие характеристики по необходимости -->
+            </tbody>
+        </table>
     </div>
 }
 else
 {
-    <div class="text-center">
-        <h2 class="row-title">В списке сравнения нет товаров!</h2>
+    <div class="text-center py-5">
+        <i class="fas fa-balance-scale fa-4x text-muted mb-3"></i>
+        <h3 class="text-muted">Список сравнения пуст</h3>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-success mt-3">
+            <i class="fas fa-store me-2"></i>Выбрать товары
+        </a>
     </div>
-
 }
-
-<div class="text-center m-5">
-    <a class="btn btn-outline-success"
-       asp-controller="Home"
-       asp-action="Index">
-        Продолжить покупки
-    </a>
-</div>
