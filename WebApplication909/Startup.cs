@@ -38,6 +38,8 @@ namespace WebApplication909
             services.AddScoped<IOrdersRepository, DbOrdersRepository>();
             services.AddScoped<IUsersRepository, InMemoryUsersRepository>();
             services.AddScoped<IRolesRepository, InMemoryRolesRepository>();
+            // services.AddScoped<IRolesRepository, DbRolesRepository>(); (если есть)
+            // services.AddScoped<IRolesRepository, DbRolesRepository>(); (если есть)
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
