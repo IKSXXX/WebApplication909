@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OnlineShop.Db.Interfaces;
 using OnlineShop.Db.Models;
 using WebApplication909.Helpers;
@@ -7,6 +8,7 @@ using WebApplication909.Models;
 namespace WebApplication909.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class OrderController : Controller
     {
         private readonly IOrdersRepository _ordersRepository;

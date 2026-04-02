@@ -20,7 +20,6 @@ namespace WebApplication909.Models
 
 
         [Display(Name = "Запомнить меня")]
-        [Required]
         public bool IsRememberMe { get; set; }
     }
 

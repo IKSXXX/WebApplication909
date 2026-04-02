@@ -1,6 +1,6 @@
 ﻿using OnlineShop.Db.Models;
 
-namespace WebApplication909.Models
+namespace OnlineShop.Db.Models
 {
     public class Comparison
     {

@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Razor.Language.Intermediate;
+using System.Security.Claims;
 using WebApplication909.Areas.Admin.Interfaces;
 using WebApplication909.Models;
 
@@ -9,88 +12,114 @@ namespace WebApplication909.Controllers
     public class AccountController : Controller
     {
         private readonly IUsersRepository _usersRepository;
-        private readonly IRolesRepository _rolesRepository;
+        private readonly PasswordHasher<User> _passwordHasher;
 
-
-        public AccountController(IUsersRepository usersRepository, IRolesRepository rolesRepository)
+        public AccountController(IUsersRepository usersRepository)
         {
-            _rolesRepository = rolesRepository;
             _usersRepository = usersRepository;
+            _passwordHasher = new PasswordHasher<User>();
         }
 
-        public IActionResult Authorization()
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Authorization(string? returnUrl = null)
         {
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
         [HttpPost]
-        public IActionResult Authorization(Authorization authorization)
+        [AllowAnonymous]
+        public async Task<IActionResult> Authorization(Authorization model, string? returnUrl = null)
         {
-            if (authorization.Login == authorization.Password)
+            if (!ModelState.IsValid) return View(model);
+
+            var user = _usersRepository.TryGetByLogin(model.Login);
+            if (user == null)
             {
-                ModelState.AddModelError("",
-                    "Имя и пароль не должны совпадать");
+                ModelState.AddModelError("", "Неверный логин или пароль");
+                return View(model);
             }
 
-            var existingUser = _usersRepository.TryGetByLogin(authorization.Login);
-
-            if (existingUser == null)
+            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, model.Password);
+            if (result == PasswordVerificationResult.Failed)
             {
-                ModelState.AddModelError("", "Такого пользователя не существует!\r\nПройдите регистрацию!");
+                ModelState.AddModelError("", "Неверный логин или пароль");
+                return View(model);
             }
 
-            if (authorization.Password != existingUser?.Password)
-            {
-                ModelState.AddModelError("", "Неправильный пароль пользователя!");
-            }
+            await SignInAsync(user, model.IsRememberMe);
 
-            if (!ModelState.IsValid)
-            {
-                return View(authorization);
-            }
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
 
-            return RedirectToAction(nameof(Index), "Home");
+            return RedirectToAction("Index", "Home");
         }
 
-        public IActionResult Registration()
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Registration(string? returnUrl = null)
         {
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
         [HttpPost]
-        public IActionResult Registration(Registration registration)
+        [AllowAnonymous]
+        public async Task<IActionResult> Registration(Registration model, string? returnUrl = null)
         {
-            if (registration.Login == registration.Password)
+            if (!ModelState.IsValid) return View(model);
+
+            if (_usersRepository.TryGetByLogin(model.Login) != null)
             {
-                ModelState.AddModelError("",
-                    "Имя и пароль не должны совпадать");
+                ModelState.AddModelError("Login", "Пользователь с таким логином уже существует");
+                return View(model);
             }
 
-            var existingUser = _usersRepository.TryGetByLogin(registration.Login);
-
-            if (existingUser != null)
+            var user = new User
             {
-                ModelState.AddModelError("", "Пользователь с таким логином уже зарегистрирован!\r\n" +
-                    "Необходимо зарегистрироваться под другим логином!");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return View(registration);
-            }
-
-            var user = new User()
-            {
-                Login = registration.Login,
-                Password = registration.Password,
-                FirstName = registration.FirstName,
-                LastName = registration.LastName,
-                Phone = registration.Phone,
+                Login = model.Login,
+                PasswordHash = _passwordHasher.HashPassword(null, model.Password),
+                Phone = model.Phone,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                CreationDateTime = DateTime.Now
             };
-
             _usersRepository.Add(user);
 
-            return RedirectToAction(nameof(Index), "Home");
+            // Автоматический вход после регистрации
+            await SignInAsync(user, isPersistent: false);
+
+            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home");
+        }
+
+        private async Task SignInAsync(User user, bool isPersistent)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Login),
+                new Claim(ClaimTypes.Email, user.Login)
+            };
+            // Если у пользователя есть роль, добавляем claim
+            if (user.Role != null)
+                claims.Add(new Claim(ClaimTypes.Role, user.Role.Name));
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+                new AuthenticationProperties { IsPersistent = isPersistent });
         }
     }
 }

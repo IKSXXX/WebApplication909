@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using WebApplication909.Areas.Admin.Interfaces;
-using WebApplication909.Areas.Admin.Repositories;
 using OnlineShop.Db;
 using OnlineShop.Db.Interfaces;
 using OnlineShop.Db.Repositories;
+using WebApplication909.Areas.Admin.Interfaces;
+using WebApplication909.Areas.Admin.Repositories;
 
 namespace WebApplication909
 {
@@ -24,20 +25,31 @@ namespace WebApplication909
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+            });
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Authorization";  
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromDays(14);
+        options.SlidingExpiration = true;
+    });
 
-            // Подключение к PostgreSQL
             var connectionString = Configuration.GetConnectionString("OnlineShopConnection");
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseNpgsql(connectionString));   // ВАЖНО: UseNpgsql
+                options.UseNpgsql(connectionString));
 
-            // Регистрация репозиториев
             services.AddScoped<IProductsRepository, DbProductsRepository>();
             services.AddScoped<ICartsRepository, DbCartsRepository>();
             services.AddScoped<IFavoritesRepository, DbFavouritesRepository>();
             services.AddScoped<IComparisonsRepository, DbComparisonsRepository>();
             services.AddScoped<IOrdersRepository, DbOrdersRepository>();
-            services.AddScoped<IUsersRepository, InMemoryUsersRepository>();
             services.AddScoped<IRolesRepository, InMemoryRolesRepository>();
+            services.AddScoped<IUsersRepository>(provider =>
+    new InMemoryUsersRepository(provider.GetRequiredService<IRolesRepository>()));
             // services.AddScoped<IRolesRepository, DbRolesRepository>(); (если есть)
             // services.AddScoped<IRolesRepository, DbRolesRepository>(); (если есть)
         }
@@ -45,9 +57,7 @@ namespace WebApplication909
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
             else
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -59,21 +69,18 @@ namespace WebApplication909
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "areas",
-                    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(name: "areas", pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            // Применение миграций (создание таблиц, если их нет)
             using var scope = app.ApplicationServices.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-            dbContext.Database.Migrate();   // Создаст таблицы через миграции
+            dbContext.Database.Migrate();
         }
     }
 }

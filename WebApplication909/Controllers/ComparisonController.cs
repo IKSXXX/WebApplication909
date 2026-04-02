@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using WebApplication909.Consts;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OnlineShop.Db.Interfaces;
-using OnlineShop.Db.Models;
+using WebApplication909.Extensions;
 using WebApplication909.Helpers;
 
 namespace WebApplication909.Controllers
 {
+    [Authorize]
     public class ComparisonController : Controller
     {
         private readonly IProductsRepository _productsRepository;
@@ -19,34 +20,34 @@ namespace WebApplication909.Controllers
 
         public IActionResult Index()
         {
-            var comparisons = _comparisonsRepository.TryGetByUserId(Constants.UserId);
-
-            return View(comparisons);
+            var userId = User.GetUserId();
+            var comparison = _comparisonsRepository.TryGetByUserId(userId);
+            var model = comparison.ToComparisonViewModel();
+            return View(model);
         }
 
         public IActionResult Add(int productId)
         {
             var product = _productsRepository.TryGetById(productId);
-
             if (product != null)
             {
-                _comparisonsRepository.Add(product ,Constants.UserId);
+                var userId = User.GetUserId();
+                _comparisonsRepository.Add(product, userId);
             }
-
             return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Delete(int productId)
         {
-            _comparisonsRepository.Delete(productId, Constants.UserId);
-
+            var userId = User.GetUserId();
+            _comparisonsRepository.Delete(productId, userId);
             return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Clear()
         {
-            _comparisonsRepository.Clear(Constants.UserId);
-
+            var userId = User.GetUserId();
+            _comparisonsRepository.Clear(userId);
             return RedirectToAction(nameof(Index));
         }
     }

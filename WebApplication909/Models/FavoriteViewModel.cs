@@ -4,7 +4,7 @@ namespace WebApplication909.Models
 {
     public class FavoriteViewModel
     {
-        public List<ProductViewModel> Items;
+        public List<ProductViewModel> Items { get; set; } = new();
         public Guid Id { get; set; }
         public string? UserId { get; set; }
     }

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebApplication909.Areas.Admin.Interfaces;
 using WebApplication909.Areas.Admin.Models;
 
 namespace WebApplication909.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class RoleController : Controller
     {
         private readonly IRolesRepository _rolesRepository;
