@@ -2,9 +2,11 @@
 using OnlineShop.Db.Repositories;
 using OnlineShop.Db.Interfaces;
 using WebApplication909.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApplication909.Controllers
 {
+    [Authorize]
     public class CartController(ICartsRepository cartRepository, IProductsRepository productsRepository) : Controller
     {
         private readonly ICartsRepository cartRepository = cartRepository;
