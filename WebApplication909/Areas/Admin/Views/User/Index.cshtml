@@ -1,4 +1,4 @@
-﻿@model List<User>
+﻿@model List<UserViewModel>
 @{
     ViewData["Title"] = "Пользователи";
 }
@@ -44,7 +44,7 @@
                                            asp-controller="User"
                                            asp-action="Detail"
                                            asp-route-id="@Model[i].Id">
-                                            <h5>@Model[i].Login</h5>
+                                            <h5>@Model[i].Email</h5>
                                         </a>
                                     </td>
                                     <td>@Model[i].FirstName</td>

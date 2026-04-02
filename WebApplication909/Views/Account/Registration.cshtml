@@ -1,4 +1,4 @@
-﻿@model Registration
+﻿@model RegistrationViewModel
 @{
     ViewData["Title"] = "Регистрация";
 }
@@ -34,9 +34,15 @@
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Login" class="form-label fw-semibold"></label>
-                        <input asp-for="Login" class="form-control" placeholder="name@example.com">
-                        <span asp-validation-for="Login" class="text-danger"></span>
+                        <label asp-for="UserName" class="form-label fw-semibold"></label>
+                        <input asp-for="UserName" class="form-control" placeholder="User777">
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-semibold"></label>
+                        <input asp-for="Email" class="form-control" placeholder="name@example.com">
+                        <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
 
                     <div class="row">

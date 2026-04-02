@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using OnlineShop.Db.Interfaces;
 using OnlineShop.Db.Models;
 using System.Runtime.Serialization;

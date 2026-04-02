@@ -1,96 +1,115 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Razor.Language.Intermediate;
-using WebApplication909.Areas.Admin.Interfaces;
+using OnlineShop.Db.Models;
 using WebApplication909.Models;
+using System.Threading.Tasks;
 
 namespace WebApplication909.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IUsersRepository _usersRepository;
-        private readonly IRolesRepository _rolesRepository;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-
-        public AccountController(IUsersRepository usersRepository, IRolesRepository rolesRepository)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
-            _rolesRepository = rolesRepository;
-            _usersRepository = usersRepository;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
+        // GET: /Account/Authorization
         public IActionResult Authorization()
         {
             return View();
         }
 
+        // POST: /Account/Authorization
         [HttpPost]
-        public IActionResult Authorization(Authorization authorization)
+        public async Task<IActionResult> Authorization(AuthorizationViewModel model)
         {
-            if (authorization.Login == authorization.Password)
+            if (model.Login == model.Password)
             {
-                ModelState.AddModelError("",
-                    "Имя и пароль не должны совпадать");
-            }
-
-            var existingUser = _usersRepository.TryGetByLogin(authorization.Login);
-
-            if (existingUser == null)
-            {
-                ModelState.AddModelError("", "Такого пользователя не существует!\r\nПройдите регистрацию!");
-            }
-
-            if (authorization.Password != existingUser?.Password)
-            {
-                ModelState.AddModelError("", "Неправильный пароль пользователя!");
+                ModelState.AddModelError("", "Логин и пароль не должны совпадать");
             }
 
             if (!ModelState.IsValid)
             {
-                return View(authorization);
+                return View(model);
             }
 
-            return RedirectToAction(nameof(Index), "Home");
+            var user = await _userManager.FindByEmailAsync(model.Login);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Пользователь с таким email не найден");
+                return View(model);
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.IsRememberMe, lockoutOnFailure: false);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            ModelState.AddModelError("", "Неверный пароль");
+            return View(model);
         }
 
+        // GET: /Account/Registration
         public IActionResult Registration()
         {
             return View();
         }
 
+        // POST: /Account/Registration
         [HttpPost]
-        public IActionResult Registration(Registration registration)
+        public async Task<IActionResult> Registration(RegistrationViewModel model)
         {
-            if (registration.Login == registration.Password)
+            if (model.UserName == model.Password)
             {
-                ModelState.AddModelError("",
-                    "Имя и пароль не должны совпадать");
-            }
-
-            var existingUser = _usersRepository.TryGetByLogin(registration.Login);
-
-            if (existingUser != null)
-            {
-                ModelState.AddModelError("", "Пользователь с таким логином уже зарегистрирован!\r\n" +
-                    "Необходимо зарегистрироваться под другим логином!");
+                ModelState.AddModelError("", "Email и пароль не должны совпадать");
             }
 
             if (!ModelState.IsValid)
             {
-                return View(registration);
+                return View(model);
             }
 
-            var user = new User()
+            var existingUser = await _userManager.FindByEmailAsync(model.UserName);
+            if (existingUser != null)
             {
-                Login = registration.Login,
-                Password = registration.Password,
-                FirstName = registration.FirstName,
-                LastName = registration.LastName,
-                Phone = registration.Phone,
+                ModelState.AddModelError("", "Пользователь с таким email уже зарегистрирован");
+                return View(model);
+            }
+
+            var user = new User
+            {
+                UserName = model.UserName,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                PhoneNumber = model.Phone
             };
 
-            _usersRepository.Add(user);
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Home");
+            }
 
-            return RedirectToAction(nameof(Index), "Home");
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+
+            return View(model);
+        }
+
+        // POST: /Account/Logout
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
     }
 }

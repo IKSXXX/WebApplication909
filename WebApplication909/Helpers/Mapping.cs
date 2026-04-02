@@ -160,5 +160,45 @@ namespace WebApplication909.Helpers
             };
         }
         #endregion
+
+        #region User
+        public static UserViewModel ToUserViewModel(this User user)
+        {
+            return new UserViewModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                Phone = user.PhoneNumber,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                CreationDateTime = DateTime.UtcNow
+            };
+        }
+
+        public static List<UserViewModel> ToUserViewModels(this List<User> users)
+        {
+            return users.Select(u => u.ToUserViewModel()).ToList();
+        }
+
+
+        #endregion
+
+        #region Comparison
+        public static ComparisonViewModel? ToComparisonViewModel(this Comparison comparison)
+        {
+            if (comparison == null)
+            {
+                return null;
+            }
+
+            return new ComparisonViewModel()
+            {
+                Id = comparison.Id,
+                Items = comparison.Items,
+                UserId = comparison.UserId
+            };
+        }
+        #endregion
     }
 }
