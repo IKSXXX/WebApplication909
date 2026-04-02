@@ -29,19 +29,21 @@ namespace WebApplication909
             {
                 options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
             });
+
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Account/Authorization";  
-        options.AccessDeniedPath = "/Account/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromDays(14);
-        options.SlidingExpiration = true;
-    });
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Authorization";
+                    options.AccessDeniedPath = "/Account/AccessDenied";
+                    options.ExpireTimeSpan = TimeSpan.FromDays(14);
+                    options.SlidingExpiration = true;
+                });
 
             var connectionString = Configuration.GetConnectionString("OnlineShopConnection");
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseNpgsql(connectionString));
 
+            // Репозитории
             services.AddScoped<IProductsRepository, DbProductsRepository>();
             services.AddScoped<ICartsRepository, DbCartsRepository>();
             services.AddScoped<IFavoritesRepository, DbFavouritesRepository>();
@@ -49,9 +51,7 @@ namespace WebApplication909
             services.AddScoped<IOrdersRepository, DbOrdersRepository>();
             services.AddScoped<IRolesRepository, InMemoryRolesRepository>();
             services.AddScoped<IUsersRepository>(provider =>
-    new InMemoryUsersRepository(provider.GetRequiredService<IRolesRepository>()));
-            // services.AddScoped<IRolesRepository, DbRolesRepository>(); (если есть)
-            // services.AddScoped<IRolesRepository, DbRolesRepository>(); (если есть)
+                new InMemoryUsersRepository(provider.GetRequiredService<IRolesRepository>()));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -78,6 +78,7 @@ namespace WebApplication909
                 endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
+            // МИГРАЦИИ — ТОЛЬКО ЗДЕСЬ (один раз при старте приложения)
             using var scope = app.ApplicationServices.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
             dbContext.Database.Migrate();
