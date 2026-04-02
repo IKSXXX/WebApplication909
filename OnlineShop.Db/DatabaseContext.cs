@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineShop.Db.Models;
-using WebApplication909.Models;
 
 namespace OnlineShop.Db
 {

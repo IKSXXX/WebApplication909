@@ -4,7 +4,6 @@ using OnlineShop.Db.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using WebApplication909.Models;
 
 namespace OnlineShop.Db.Repositories
 {
@@ -20,30 +19,27 @@ namespace OnlineShop.Db.Repositories
         public Favorite? TryGetByUserId(string userId)
         {
             return _context.Favorites
-                .Include(f => f.Items)
+                .Include(f => f)
                 .FirstOrDefault(f => f.UserId == userId);
         }
 
         public void Add(Product product, string userId)
         {
-            var favorite = TryGetByUserId(userId);
-            if (favorite == null)
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new ArgumentException("UserId cannot be null or empty", nameof(userId));
+            var existing = _context.Favorites
+                .FirstOrDefault(f => f.ProductId == product.Id && f.UserId == userId);
+
+            if (existing != null)
+                return; 
+
+            var favorite = new Favorite
             {
-                favorite = new Favorite
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = userId,
-                    Items = new List<Product> { product }
-                };
-                _context.Favorites.Add(favorite);
-            }
-            else
-            {
-                if (!favorite.Items.Any(p => p.Id == product.Id))
-                {
-                    favorite.Items.Add(product);
-                }
-            }
+                UserId = userId,
+                ProductId = product.Id,
+            };
+
+            _context.Favorites.Add(favorite);
             _context.SaveChanges();
         }
 
