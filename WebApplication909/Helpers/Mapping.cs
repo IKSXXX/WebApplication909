@@ -46,8 +46,7 @@ namespace WebApplication909.Helpers
             return new FavoriteViewModel
             {
                 Id = favorite.Id,
-                UserId = favorite.UserId,
-                Items = favorite.Items?.Select(p => p.ToProductViewModel()).ToList() ?? new()
+                UserId = favorite.UserId
             };
         }
         #endregion

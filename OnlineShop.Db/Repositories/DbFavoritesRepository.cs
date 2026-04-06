@@ -43,19 +43,7 @@ namespace OnlineShop.Db.Repositories
             _context.SaveChanges();
         }
 
-        public void Delete(int productId, string userId)
-        {
-            var favorite = TryGetByUserId(userId);
-            if (favorite != null)
-            {
-                var product = favorite.Items.FirstOrDefault(p => p.Id == productId);
-                if (product != null)
-                {
-                    favorite.Items.Remove(product);
-                    _context.SaveChanges();
-                }
-            }
-        }
+
 
         public void Clear(string userId)
         {
@@ -65,6 +53,11 @@ namespace OnlineShop.Db.Repositories
                 _context.Favorites.Remove(favorite);
                 _context.SaveChanges();
             }
+        }
+
+        public void Delete(int productId, string userId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

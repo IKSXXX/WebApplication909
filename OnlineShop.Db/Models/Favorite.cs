@@ -4,7 +4,7 @@ namespace OnlineShop.Db.Models
 {
     public class Favorite
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string UserId { get; set; } = string.Empty;
         public virtual DeliveryUser? User { get; set; } 
         public int ProductId { get; set; }
