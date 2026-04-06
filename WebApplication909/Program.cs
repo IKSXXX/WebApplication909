@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using WebApplication909.Areas.Admin.Interfaces;
 
 namespace WebApplication909
 {
@@ -22,5 +21,5 @@ namespace WebApplication909
                 {
                     webBuilder.UseStartup<Startup>();
                 });
-     }
+    }
 }

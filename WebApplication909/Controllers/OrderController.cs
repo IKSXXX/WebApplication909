@@ -1,14 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using OnlineShop.Db.Interfaces;
 using OnlineShop.Db.Models;
 using System.Runtime.Serialization;
 using System.Security.Cryptography.X509Certificates;
+using WebApplication909.Extensions;
 using WebApplication909.Helpers;
 using WebApplication909.Models;
 
 namespace WebApplication909.Controllers
 {
+    [Authorize]
     public class OrderController : Controller
     {
         private readonly ICartsRepository _cartsRepository;
@@ -20,9 +23,13 @@ namespace WebApplication909.Controllers
             _ordersRepository = ordersRepository;
         }
 
+        [AllowAnonymous]
+        public IActionResult Success() => View();
+
         public IActionResult Index()
         {
-            var cart = _cartsRepository.TryGetByUserId(Constants.UserId);
+            var userId = User.GetUserId();
+            var cart = _cartsRepository.TryGetByUserId(userId);
 
             var cartView = cart.ToCartViewModel();
 
@@ -34,15 +41,12 @@ namespace WebApplication909.Controllers
             return View(order);
         }
 
-        public IActionResult Success()
-        {
-            return View();
-        }
 
         [HttpPost]
         public IActionResult Buy(OrderViewModel order)
         {
-            var cart = _cartsRepository.TryGetByUserId(Constants.UserId);
+            var userId = User.GetUserId();
+            var cart = _cartsRepository.TryGetByUserId(userId);
 
             if (cart == null)
             {
@@ -50,7 +54,7 @@ namespace WebApplication909.Controllers
             }
 
             order.Items = cart.Items.ToCartItemViewModels();
-            order.UserId = Constants.UserId;
+            order.UserId = userId;
 
             if (!ModelState.IsValid)
             {
@@ -69,7 +73,7 @@ namespace WebApplication909.Controllers
 
             _ordersRepository.Add(orderDb);
 
-            _cartsRepository.Clear(Constants.UserId);
+            _cartsRepository.Clear(userId);
 
             return RedirectToAction(nameof(Success));
         }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OnlineShop.Db.Interfaces;
 using OnlineShop.Db.Models;
+using WebApplication909.Extensions;
 using WebApplication909.Helpers;
 
 namespace WebApplication909.Controllers
@@ -12,7 +13,8 @@ namespace WebApplication909.Controllers
 
         public IActionResult Index()
         {
-            var favorites = _favoritesRepository.TryGetByUserId(Constants.UserId);
+            var userId = User.GetUserId();
+            var favorites = _favoritesRepository.TryGetByUserId(userId);
 
             return View(favorites.ToFavoriteViewModel());
         }
@@ -23,7 +25,8 @@ namespace WebApplication909.Controllers
 
             if (product != null)
             {
-                _favoritesRepository.Add(product, Constants.UserId);
+                var userId = User.GetUserId();
+                _favoritesRepository.Add(product, userId);
             }
 
             return RedirectToAction(nameof(Index));
@@ -31,14 +34,16 @@ namespace WebApplication909.Controllers
 
         public IActionResult Delete(int productId)
         {
-            _favoritesRepository.Delete(productId, Constants.UserId);
+            var userId = User.GetUserId();
+            _favoritesRepository.Delete(productId, userId);
 
             return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Clear()
         {
-            _favoritesRepository.Clear(Constants.UserId);
+            var userId = User.GetUserId();
+            _favoritesRepository.Clear(userId);
 
             return RedirectToAction(nameof(Index));
         }

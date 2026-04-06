@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OnlineShop.Db.Interfaces;
 using WebApplication909.Helpers;
 using WebApplication909.Models;
@@ -6,6 +7,7 @@ using WebApplication909.Models;
 namespace WebApplication909.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class ProductController : Controller
     {
         private readonly IProductsRepository _productsRepository;

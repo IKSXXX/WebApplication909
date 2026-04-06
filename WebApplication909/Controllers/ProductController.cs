@@ -19,7 +19,7 @@ namespace WebApplication909.Controllers
             if (product == null)
                 return NotFound();
 
-            return View(product.ToProductViewModel());   // преобразуем в ProductViewModel
+            return View(product.ToProductViewModel());  
         }
     }
 }

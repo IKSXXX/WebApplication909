@@ -9,18 +9,14 @@ namespace WebApplication909.Helpers
         public static List<ProductViewModel> ToProductViewModels(this List<Product> productsDb)
         {
             var productsViewModel = new List<ProductViewModel>();
-
             foreach (var productDb in productsDb)
-            {
                 productsViewModel.Add(productDb.ToProductViewModel());
-            }
-
             return productsViewModel;
         }
 
         public static ProductViewModel ToProductViewModel(this Product productDb)
         {
-            return new ProductViewModel()
+            return new ProductViewModel
             {
                 Id = productDb.Id,
                 Name = productDb.Name,
@@ -32,31 +28,18 @@ namespace WebApplication909.Helpers
 
         public static Product ToProductDb(this ProductViewModel product)
         {
-            return new Product()
+            return new Product
             {
                 Id = product.Id,
                 Name = product.Name,
                 Cost = product.Cost,
                 Description = product.Description,
-                PhotoPath = product.PhotoPath,
+                PhotoPath = product.PhotoPath
             };
         }
         #endregion
 
         #region Favorite
-
-        public static List<FavoriteViewModel> ToFavoriteViewModels(this List<Favorite> favoritesDb)
-        {
-            var favoritesViewModel = new List<FavoriteViewModel>();
-
-            foreach (var cartDbItem in favoritesDb)
-            {
-                favoritesViewModel.Add(cartDbItem.ToFavoriteViewModel());
-            }
-
-            return favoritesViewModel;
-        }
-
         public static FavoriteViewModel? ToFavoriteViewModel(this Favorite? favorite)
         {
             if (favorite == null) return null;
@@ -69,41 +52,46 @@ namespace WebApplication909.Helpers
         }
         #endregion
 
+        #region Comparison
+        public static ComparisonViewModel? ToComparisonViewModel(this OnlineShop.Db.Models.Comparison comparison)
+        {
+            if (comparison == null) return null;
+            return new ComparisonViewModel
+            {
+                Id = comparison.Id,
+                UserId = comparison.UserId,
+                Items = comparison.Items?.Select(p => p.ToProductViewModel()).ToList() ?? new()
+            };
+        }
+        #endregion
+
         #region Cart
         public static List<CartItemViewModel> ToCartItemViewModels(this List<CartItem> cartDbItems)
         {
             var cartItemsViewModel = new List<CartItemViewModel>();
-
             foreach (var cartDbItem in cartDbItems)
-            {
                 cartItemsViewModel.Add(cartDbItem.ToCartItemViewModel());
-            }
-
             return cartItemsViewModel;
         }
 
         public static CartItemViewModel ToCartItemViewModel(this CartItem cartDbItem)
         {
-            return new CartItemViewModel()
+            return new CartItemViewModel
             {
                 Id = cartDbItem.Id,
                 Product = cartDbItem.Product.ToProductViewModel(),
-                Quantity = cartDbItem.Quantity,
+                Quantity = cartDbItem.Quantity
             };
         }
 
         public static CartViewModel? ToCartViewModel(this Cart? cartDb)
         {
-            if (cartDb == null)
-            {
-                return null;
-            }
-
-            return new CartViewModel()
+            if (cartDb == null) return null;
+            return new CartViewModel
             {
                 Id = cartDb.Id,
                 UserId = cartDb.UserId,
-                Items = cartDb.Items.ToCartItemViewModels(),
+                Items = cartDb.Items.ToCartItemViewModels()
             };
         }
         #endregion
@@ -112,31 +100,27 @@ namespace WebApplication909.Helpers
         public static List<OrderViewModel> ToOrderViewModels(this List<Order> ordersDb)
         {
             var ordersViewModel = new List<OrderViewModel>();
-
             foreach (var orderDb in ordersDb)
-            {
                 ordersViewModel.Add(orderDb.ToOrderViewModel());
-            }
-
             return ordersViewModel;
         }
 
         public static OrderViewModel ToOrderViewModel(this Order orderDb)
         {
-            return new OrderViewModel()
+            return new OrderViewModel
             {
                 Id = orderDb.Id,
                 UserId = orderDb.UserId,
                 Items = orderDb.Items.ToCartItemViewModels(),
                 DeliveryUser = orderDb.DeliveryUser.ToDeliveryUserViewModel(),
                 CreationDateTime = orderDb.CreationDateTime,
-                Status = (OrderStatusViewModel)orderDb.Status,
+                Status = (OrderStatusViewModel)orderDb.Status
             };
         }
 
         public static DeliveryUserViewModel ToDeliveryUserViewModel(this DeliveryUser deliveryUserDb)
         {
-            return new DeliveryUserViewModel()
+            return new DeliveryUserViewModel
             {
                 Id = deliveryUserDb.Id,
                 Name = deliveryUserDb.Name,
@@ -149,7 +133,7 @@ namespace WebApplication909.Helpers
 
         public static DeliveryUser ToDeliveryUserDb(this DeliveryUserViewModel deliveryUser)
         {
-            return new DeliveryUser()
+            return new DeliveryUser
             {
                 Id = deliveryUser.Id,
                 Name = deliveryUser.Name,

@@ -2,6 +2,7 @@
 using OnlineShop.Db.Interfaces;
 using WebApplication909.Helpers;
 using WebApplication909.Models;
+using WebApplication909.Extensions;
 
 namespace WebApplication909.Views.Shared.ViewComponents.CartViewComponents
 {
@@ -9,7 +10,8 @@ namespace WebApplication909.Views.Shared.ViewComponents.CartViewComponents
     {
         public IViewComponentResult Invoke()
         {
-            var cart = cartsRepository.TryGetByUserId(Constants.UserId).ToCartViewModel();
+            var userId = User.GetUserId();
+            var cart = cartsRepository.TryGetByUserId(userId).ToCartViewModel();
             var productsCount = cart?.Items.Count() ?? 0;
 
             return View("Cart", productsCount);
