@@ -1,0 +1,1 @@
+﻿DROP database "OnlineShop_1634";

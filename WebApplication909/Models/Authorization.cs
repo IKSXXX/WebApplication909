@@ -4,23 +4,13 @@ namespace WebApplication909.Models
 {
     public class Authorization
     {
-        [Display(Name = "Логин", Prompt = "Ваш логин")]
-        [Required(ErrorMessage = "Не указан логин")]
-        [DataType(DataType.EmailAddress)]
-        [EmailAddress(ErrorMessage = "Введите валидный email")]
-        [StringLength(30, MinimumLength = 5, ErrorMessage = "Логин должен быть от {2} до {1} символов")]
-        public required string Login { get; set; }
+        [Required(ErrorMessage = "Введите логин")]
+        public string Login { get; set; } = string.Empty;
 
-
-        [Display(Name = "Пароль", Prompt = "Ваш пароль")]
-        [Required(ErrorMessage = "Не указан пароль")]
+        [Required(ErrorMessage = "Введите пароль")]
         [DataType(DataType.Password)]
-        [StringLength(50, MinimumLength = 6, ErrorMessage = "Пароль должен быть от {2} до {1} символов")]
-        public required string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
-
-        [Display(Name = "Запомнить меня")]
         public bool IsRememberMe { get; set; }
     }
-
 }

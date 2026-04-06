@@ -1,4 +1,4 @@
-﻿@model List<User>
+﻿@model List<OnlineShop.Db.Models.AppUser>
 @{
     ViewData["Title"] = "Пользователи";
 }
@@ -16,9 +16,9 @@
                 <div class="col-12">
                     <div class="text-end">
                         <a class="btn btn-outline-success mb-2 mt-2"
-                           asp-area="Admin"
-                           asp-controller="User"
-                           asp-action="Add">
+                               asp-area="Admin"
+                               asp-controller="User"
+                               asp-action="Add">
                             Добавить нового пользователя
                         </a>
                     </div>
@@ -40,11 +40,11 @@
                                     <td class="fw-bold">@(i + 1)</td>
                                     <td align="left">
                                         <a class="text-success"
-                                           asp-area="Admin"
-                                           asp-controller="User"
-                                           asp-action="Detail"
-                                           asp-route-id="@Model[i].Id">
-                                            <h5>@Model[i].Login</h5>
+                                               asp-area="Admin"
+                                               asp-controller="User"
+                                               asp-action="Detail"
+                                               asp-route-id="@Model[i].Id">
+                                            <h5>@Model[i].UserName</h5>
                                         </a>
                                     </td>
                                     <td>@Model[i].FirstName</td>
@@ -52,10 +52,10 @@
                                     <td>@Model[i].Phone</td>
                                     <td align="left">
                                         <a class="text-success"
-                                           asp-area="Admin"
-                                           asp-controller="User"
-                                           asp-action="Detail"
-                                           asp-route-id="@Model[i].Id">
+                                               asp-area="Admin"
+                                               asp-controller="User"
+                                               asp-action="Detail"
+                                               asp-route-id="@Model[i].Id">
                                             Подробнее
                                         </a>
                                     </td>
@@ -81,9 +81,9 @@
             </div>
             <div class="text-center mt-5">
                 <a class="btn btn-outline-success mb-2 mt-2"
-                   asp-area="Admin"
-                   asp-controller="User"
-                   asp-action="Add">
+                       asp-area="Admin"
+                       asp-controller="User"
+                       asp-action="Add">
                     Добавить нового пользователя
                 </a>
             </div>

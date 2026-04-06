@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using WebApplication909.Areas.Admin.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using OnlineShop.Db.Models;
 using WebApplication909.Areas.Admin.Models;
-using WebApplication909.Models;
 
 namespace WebApplication909.Areas.Admin.Controllers
 {
@@ -11,140 +11,172 @@ namespace WebApplication909.Areas.Admin.Controllers
     [Authorize(Roles = "Admin")]
     public class UserController : Controller
     {
-        private readonly IUsersRepository _usersRepository;
-        private readonly IRolesRepository _rolesRepository;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserController(IUsersRepository usersRepository, IRolesRepository rolesRepository)
+        public UserController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
         {
-            _usersRepository = usersRepository;
-            _rolesRepository = rolesRepository;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var users = _usersRepository.GetAll();
+            var users = await _userManager.Users.ToListAsync();
             return View(users);
-        }
-
-        public IActionResult Delete(Guid id)
-        {
-            _usersRepository.Delete(id);
-            return RedirectToAction(nameof(Index));
-        }
-
-        public IActionResult Detail(Guid id)
-        {
-            var user = _usersRepository.TryGetById(id);
-            if (user == null) return NotFound();
-            return View(user);
         }
 
         [HttpGet]
         public IActionResult Add()
         {
-            return View();
+            return View(new AddUserViewModel());
         }
 
         [HttpPost]
-        public IActionResult Add(User user)
+        public async Task<IActionResult> Add(AddUserViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(user);
-
-            if (_usersRepository.TryGetByLogin(user.Login) != null)
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("Login", "Пользователь с таким логином уже существует");
-                return View(user);
+                var user = new AppUser
+                {
+                    UserName = model.Login,
+                    Email = model.Login,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Phone = model.Phone,
+                    CreationDateTime = DateTime.UtcNow
+                };
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    // Назначить роль "User" по умолчанию
+                    await _userManager.AddToRoleAsync(user, "User");
+                    return RedirectToAction("Index");
+                }
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
             }
-
-            _usersRepository.Add(user);
-            return RedirectToAction(nameof(Index));
+            return View(model);
         }
 
         [HttpGet]
-        public IActionResult Update(Guid id)
+        public async Task<IActionResult> Detail(string id)
         {
-            var user = _usersRepository.TryGetById(id);
-            if (user == null) return NotFound();
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
+            return View(user);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Update(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
             return View(user);
         }
 
         [HttpPost]
-        public IActionResult Update(User user)
+        public async Task<IActionResult> Update(AppUser model)
         {
-            if (!ModelState.IsValid)
-                return View(user);
-
-            var existingUser = _usersRepository.TryGetByLogin(user.Login);
-            if (existingUser != null && existingUser.Id != user.Id)
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("Login", "Пользователь с таким логином уже существует");
-                return View(user);
-            }
+                var user = await _userManager.FindByIdAsync(model.Id);
+                if (user == null)
+                    return NotFound();
 
-            _usersRepository.Update(user);
-            return RedirectToAction(nameof(Index));
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.Phone = model.Phone;
+                user.UserName = model.UserName;
+                user.Email = model.Email;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                    return RedirectToAction("Index");
+
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
+            }
+            return View(model);
         }
 
         [HttpGet]
-        public IActionResult ChangePassword(Guid id)
+        public async Task<IActionResult> ChangePassword(string id)
         {
-            var existingUser = _usersRepository.TryGetById(id);
-            if (existingUser == null) return NotFound();
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
 
-            var changePassword = new ChangePassword
-            {
-                Login = existingUser.Login
-            };
-            return View(changePassword);
+            var model = new ChangePasswordViewModel { Login = user.UserName };
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult ChangePassword(ChangePassword changePassword)
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            if (changePassword.Login == changePassword.Password)
-                ModelState.AddModelError("", "Имя и пароль не должны совпадать");
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByNameAsync(model.Login);
+                if (user == null)
+                    return NotFound();
 
-            if (!ModelState.IsValid)
-                return View(changePassword);
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var result = await _userManager.ResetPasswordAsync(user, token, model.Password);
+                if (result.Succeeded)
+                    return RedirectToAction("Index");
 
-            _usersRepository.ChangePassword(changePassword.Login, changePassword.Password);
-            var user = _usersRepository.TryGetByLogin(changePassword.Login);
-            if (user == null) return RedirectToAction(nameof(Index));
-            return RedirectToAction(nameof(Detail), new { id = user.Id });
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
+            }
+            return View(model);
         }
 
         [HttpGet]
-        public IActionResult ChangeRole(Guid id)
+        public async Task<IActionResult> ChangeRole(string id)
         {
-            var existingUser = _usersRepository.TryGetById(id);
-            if (existingUser == null) return NotFound();
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
 
-            var changeRole = new ChangeRole
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var allRoles = await _roleManager.Roles.Select(r => r.Name).ToListAsync();
+
+            var model = new ChangeRoleViewModel
             {
-                Login = existingUser.Login,
-                Role = existingUser.Role?.Name,
-                Roles = _rolesRepository.GetAll().Select(role => new SelectListItem
+                Login = user.UserName,
+                Role = userRoles.FirstOrDefault() ?? "User",
+                Roles = allRoles.Select(r => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
                 {
-                    Value = role.Name,
-                    Text = role.Name
+                    Text = r,
+                    Value = r
                 }).ToList()
             };
-            return View(changeRole);
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult ChangeRole(ChangeRole changeRole)
+        public async Task<IActionResult> ChangeRole(ChangeRoleViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(changeRole);
+            var user = await _userManager.FindByNameAsync(model.Login);
+            if (user == null)
+                return NotFound();
 
-            var newRole = _rolesRepository.TryGetByName(changeRole.Role);
-            _usersRepository.ChangeRole(changeRole.Login, newRole);
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            await _userManager.AddToRoleAsync(user, model.Role);
 
-            var user = _usersRepository.TryGetByLogin(changeRole.Login);
-            if (user == null) return RedirectToAction(nameof(Index));
-            return RedirectToAction(nameof(Detail), new { id = user.Id });
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user != null)
+                await _userManager.DeleteAsync(user);
+            return RedirectToAction("Index");
         }
     }
 }

@@ -1,125 +1,102 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using WebApplication909.Areas.Admin.Interfaces;
+using OnlineShop.Db.Models;
 using WebApplication909.Models;
 
 namespace WebApplication909.Controllers
 {
+    [AllowAnonymous]
     public class AccountController : Controller
     {
-        private readonly IUsersRepository _usersRepository;
-        private readonly PasswordHasher<User> _passwordHasher;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
 
-        public AccountController(IUsersRepository usersRepository)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
-            _usersRepository = usersRepository;
-            _passwordHasher = new PasswordHasher<User>();
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Authorization(string? returnUrl = null)
+        public IActionResult Authorization(string returnUrl = null)
         {
             ViewBag.ReturnUrl = returnUrl;
-            return View();
+            return View(new Authorization { Login = "", Password = "" });
         }
 
         [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> Authorization(Authorization model, string? returnUrl = null)
+        public async Task<IActionResult> Authorization(Authorization model, string returnUrl = null)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            var user = _usersRepository.TryGetByLogin(model.Login);
-            if (user == null)
+            if (ModelState.IsValid)
             {
+                var user = await _userManager.FindByNameAsync(model.Login);
+                if (user != null)
+                {
+                    var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.IsRememberMe, lockoutOnFailure: false);
+                    if (result.Succeeded)
+                        return Redirect(returnUrl ?? "/");
+                }
                 ModelState.AddModelError("", "Неверный логин или пароль");
-                return View(model);
             }
-
-            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, model.Password);
-            if (result == PasswordVerificationResult.Failed)
-            {
-                ModelState.AddModelError("", "Неверный логин или пароль");
-                return View(model);
-            }
-
-            await SignInAsync(user, model.IsRememberMe);
-
-            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-                return Redirect(returnUrl);
-
-            return RedirectToAction("Index", "Home");
+            ViewBag.ReturnUrl = returnUrl;
+            return View(model);
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Registration(string? returnUrl = null)
+        public IActionResult Registration(string returnUrl = null)
         {
             ViewBag.ReturnUrl = returnUrl;
-            return View();
+            return View(new Registration
+            {
+                Login = "",
+                Password = "",
+                ConfirmPassword = "",
+                FirstName = "",
+                LastName = "",
+                Phone = ""
+            });
         }
 
         [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> Registration(Registration model, string? returnUrl = null)
+        public async Task<IActionResult> Registration(Registration model, string returnUrl = null)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            if (_usersRepository.TryGetByLogin(model.Login) != null)
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("Login", "Пользователь с таким логином уже существует");
-                return View(model);
+                var user = new AppUser
+                {
+                    UserName = model.Login,
+                    Email = model.Login,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Phone = model.Phone,
+                    CreationDateTime = DateTime.UtcNow
+                };
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    // Добавляем роль User
+                    await _userManager.AddToRoleAsync(user, "User");
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return Redirect(returnUrl ?? "/");
+                }
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
             }
-
-            var user = new User
-            {
-                Login = model.Login,
-                PasswordHash = _passwordHasher.HashPassword(null, model.Password),
-                Phone = model.Phone,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                CreationDateTime = DateTime.Now
-            };
-            _usersRepository.Add(user);
-
-            // Автоматический вход после регистрации
-            await SignInAsync(user, isPersistent: false);
-
-            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-                return Redirect(returnUrl);
-
-            return RedirectToAction("Index", "Home");
+            ViewBag.ReturnUrl = returnUrl;
+            return View(model);
         }
 
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
 
-        private async Task SignInAsync(User user, bool isPersistent)
+        public IActionResult AccessDenied()
         {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Login),
-                new Claim(ClaimTypes.Email, user.Login)
-            };
-            // Если у пользователя есть роль, добавляем claim
-            if (user.Role != null)
-                claims.Add(new Claim(ClaimTypes.Role, user.Role.Name));
-
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-                new AuthenticationProperties { IsPersistent = isPersistent });
+            return View();
         }
     }
 }

@@ -5,13 +5,13 @@ namespace WebApplication909.Areas.Admin.Interfaces
 {
     public interface IUsersRepository
     {
-        void Add(User user);
-        User? TryGetByLogin(string login);
-        List<User> GetAll();
-        User? TryGetById(Guid userId);
-        void Delete(Guid userId);
-        void Update(User user);
-        void ChangePassword(string login, string newPassword);
-        void ChangeRole(string login, Role? newRole);
+        Task<List<User>> GetAllAsync();
+        Task<User?> TryGetByIdAsync(Guid userId);
+        Task<User?> TryGetByLoginAsync(string login);
+        Task AddAsync(User user);
+        Task UpdateAsync(User user);
+        Task DeleteAsync(Guid userId);
+        Task ChangePasswordAsync(string login, string newPassword);
+        Task ChangeRoleAsync(string login, Role? newRole);
     }
 }
